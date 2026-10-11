@@ -1,0 +1,147 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=1920">
+  <title>{{SLIDE_TITLE}}</title>
+  <link rel="stylesheet" href="../assets/css/pds-tokens.css">
+  <link rel="stylesheet" href="../assets/css/slide-base.css">
+  <link rel="stylesheet" href="../assets/css/animations.css">
+  <script>(function(){function s(){document.documentElement.style.setProperty('--scale',Math.min(window.innerWidth/1920,window.innerHeight/920));}s();window.addEventListener('resize',s);})();</script>
+  <style>
+    /* Full-bleed media: the image runs edge-to-edge vertically (flush with the
+       player's top and bottom bars) and to the right edge of the slide. Text
+       keeps its normal breathing room on the left. */
+    .slide__split {
+      padding: 0;
+      align-items: stretch;
+      gap: 0;
+    }
+    .slide__split--text {
+      /* generous breathing room: 140px from the left edge, 80px gap before
+         the full-bleed image. NOTE: plain px values on purpose — --col-gap is
+         a percentage and calc(% * px) is invalid CSS, which silently killed
+         this entire declaration in an earlier version. */
+      padding: var(--pds-slide-pad-y) 80px var(--pds-slide-pad-y) 140px;
+      justify-content: center;
+    }
+    .slide__split--media {
+      height: 100% !important;
+      border-radius: 0;
+      align-items: stretch;
+    }
+    .slide__split--media img,
+    .slide__split--media video {
+      border-radius: 0;
+    }
+    /* soft blend so the photo doesn't hard-cut against the text column */
+    .slide__split--media::before {
+      content: '';
+      position: absolute;
+      inset: 0;
+      background: linear-gradient(to right, rgba(13,13,15,0.55) 0%, rgba(13,13,15,0) 22%);
+      pointer-events: none;
+      z-index: 1;
+    }
+  </style>
+</head>
+<body>
+
+<div class="slide" data-slide-id="{{SLIDE_ID}}">
+
+  <div class="slide__split">
+
+    <!-- Left: text -->
+    <div class="slide__split--text">
+      <div class="pds-accent-bar anim-bar-grow" style="--anim-delay: 0.1s;"></div>
+      <h2 class="pds-heading-display anim-fade-right" style="--anim-delay: 0.2s;">{{SLIDE_TITLE}}</h2>
+      {{BODY_CONTENT_HTML}}
+      {{CALLOUT_HTML}}
+    </div>
+
+    <!-- Right: image/video -->
+    <div class="slide__split--media anim-fade-left" style="--anim-delay: 0.25s;">
+      <img data-img-adjust src="{{IMAGE_PATH}}" alt="" style="--img-pos:{{IMG_POS}};--img-scale:{{IMG_SCALE}};" onerror="this.style.display='none'">
+    </div>
+
+  </div>
+
+</div>
+
+<script src="../assets/vendor/gsap/gsap.min.js"></script>
+<script src="../assets/vendor/porsche-components.js"></script>
+<script>
+/* ── SandboxRuntime shim ─────────────────────────────────────────────────── */
+var SandboxRuntime = (function () {
+  var CR = (function () {
+    try { return window.parent && window.parent.CourseRuntime ? window.parent.CourseRuntime : null; }
+    catch (_) { return null; }
+  })();
+
+  function makeFakeVO() {
+    var listeners = {};
+    var obj = {
+      currentTime: 0,
+      _wasPlaying: false,
+      addEventListener: function (e, f) { (listeners[e] = listeners[e] || []).push(f); },
+      removeEventListener: function (e, f) {
+        if (listeners[e]) listeners[e] = listeners[e].filter(function (g) { return g !== f; });
+      },
+      _fire: function (e) { (listeners[e] || []).forEach(function (f) { f(); }); },
+      play: function () { return Promise.resolve(); }
+    };
+    (function poll() {
+      requestAnimationFrame(function () {
+        if (CR) {
+          obj.currentTime = CR.getAudioCurrentTime ? CR.getAudioCurrentTime() : 0;
+          var p = CR.isAudioPlaying ? CR.isAudioPlaying() : false;
+          if (!obj._wasPlaying && p) obj._wasPlaying = true;
+          if (obj._wasPlaying && !p && obj.currentTime > 0) {
+            if (!(document.querySelector('.slide') || {classList:{contains:function(){return false;}}}).classList.contains('is-paused')) {
+              obj._wasPlaying = false;
+              obj._fire('ended');
+            }
+          }
+          obj._fire('timeupdate');
+        }
+        poll();
+      });
+    })();
+    return obj;
+  }
+
+  function makeInteraction() {
+    return {
+      src: '',
+      play: function () {
+        if (CR && CR.playInteractionAudio) {
+          CR.playInteractionAudio({ src: this.src });
+        } else {
+          var a = new Audio(this.src);
+          a.play().catch(function () {});
+        }
+        return Promise.resolve();
+      }
+    };
+  }
+
+  window.addEventListener('message', function (e) {
+    if (!e.data || e.data.type !== 'player-play-state') return;
+    var s = document.querySelector('.slide');
+    if (s) s.classList.toggle('is-paused', e.data.state === 'paused');
+  });
+
+  return { voAudio: makeFakeVO(), interactionAudio: makeInteraction() };
+})();
+
+/* ── Slide logic ─────────────────────────────────────────────────────────── */
+(function () {
+  document.querySelectorAll('.anim-fade-right, .anim-fade-left, .anim-bar-grow').forEach(function (el) {
+    el.classList.add('is-visible');
+  });
+
+})();
+</script>
+
+</body>
+</html>

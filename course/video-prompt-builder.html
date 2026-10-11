@@ -1,0 +1,933 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Porsche WBT - Video Prompt Builder</title>
+<style>*{box-sizing:border-box}html,body{margin:0;padding:0}img{max-width:100%}</style>
+</head>
+<body>
+<style>
+  :root {
+    --bg: #f4f4f5;
+    --surface: #ffffff;
+    --surface-2: #fbfbfc;
+    --ink: #131316;
+    --ink-2: #52525b;
+    --ink-3: #8a8a93;
+    --line: #e3e3e7;
+    --line-strong: #cfcfd5;
+    --accent: #d5001c;
+    --accent-ink: #ffffff;
+    --good: #1a7f52;
+    --warn: #b45309;
+    --warn-bg: #fdf3e6;
+    --code-bg: #101014;
+    --code-ink: #e9e9ee;
+    --code-dim: #7d7d88;
+    --code-accent: #ff5a6e;
+    --code-key: #6fb2ff;
+    --radius: 10px;
+    --mono: ui-monospace, "SF Mono", "SFMono-Regular", "Cascadia Mono", "Menlo", "Consolas", monospace;
+    --sans: -apple-system, BlinkMacSystemFont, "Segoe UI", system-ui, "Helvetica Neue", Arial, sans-serif;
+  }
+  @media (prefers-color-scheme: dark) {
+    :root {
+      --bg: #0d0d0f;
+      --surface: #161619;
+      --surface-2: #1c1c20;
+      --ink: #f2f2f4;
+      --ink-2: #adadb6;
+      --ink-3: #74747e;
+      --line: #2a2a30;
+      --line-strong: #3a3a42;
+      --accent: #ff2740;
+      --accent-ink: #ffffff;
+      --good: #4ade80;
+      --warn: #f0b45f;
+      --warn-bg: #2a2114;
+      --code-bg: #0a0a0c;
+      --code-ink: #e9e9ee;
+    }
+  }
+  :root[data-theme="light"] {
+    --bg: #f4f4f5; --surface: #ffffff; --surface-2: #fbfbfc; --ink: #131316;
+    --ink-2: #52525b; --ink-3: #8a8a93; --line: #e3e3e7; --line-strong: #cfcfd5;
+    --accent: #d5001c; --warn-bg: #fdf3e6; --code-bg: #101014; --code-ink: #e9e9ee;
+  }
+  :root[data-theme="dark"] {
+    --bg: #0d0d0f; --surface: #161619; --surface-2: #1c1c20; --ink: #f2f2f4;
+    --ink-2: #adadb6; --ink-3: #74747e; --line: #2a2a30; --line-strong: #3a3a42;
+    --accent: #ff2740; --good: #4ade80; --warn: #f0b45f; --warn-bg: #2a2114;
+    --code-bg: #0a0a0c; --code-ink: #e9e9ee;
+  }
+
+  * { box-sizing: border-box; }
+  body { margin: 0; }
+  .app {
+    font-family: var(--sans);
+    background: var(--bg);
+    color: var(--ink);
+    line-height: 1.5;
+    min-height: 100vh;
+    -webkit-font-smoothing: antialiased;
+  }
+
+  .wrap { max-width: 1240px; margin: 0 auto; padding: 32px 24px 80px; }
+
+  header.hd { margin-bottom: 28px; }
+  .eyebrow {
+    font-size: 11px; font-weight: 600; letter-spacing: .16em; text-transform: uppercase;
+    color: var(--accent); display: flex; align-items: center; gap: 10px; margin-bottom: 10px;
+  }
+  .eyebrow::before { content: ""; width: 24px; height: 2px; background: var(--accent); display: inline-block; }
+  h1 { font-size: clamp(24px, 3.2vw, 34px); line-height: 1.1; margin: 0 0 8px; letter-spacing: -.02em; text-wrap: balance; font-weight: 700; }
+  .lede { color: var(--ink-2); font-size: 15px; max-width: 62ch; margin: 0; }
+
+  .grid { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1.02fr); gap: 24px; align-items: start; }
+  @media (max-width: 920px) { .grid { grid-template-columns: 1fr; } }
+
+  /* not sticky: a tall output (long house-rules block) would pin its bottom out of reach */
+  .col-out { position: static; }
+
+  .card {
+    background: var(--surface); border: 1px solid var(--line);
+    border-radius: var(--radius); padding: 20px; margin-bottom: 18px;
+  }
+  .card > h2 {
+    font-size: 12px; font-weight: 700; letter-spacing: .1em; text-transform: uppercase;
+    color: var(--ink-2); margin: 0 0 4px; display: flex; align-items: center; gap: 8px;
+  }
+  .card > .hint { font-size: 12.5px; color: var(--ink-3); margin: 0 0 16px; }
+  .step-n {
+    display: inline-flex; align-items: center; justify-content: center;
+    width: 20px; height: 20px; border-radius: 5px; background: var(--accent);
+    color: var(--accent-ink); font-size: 11px; font-weight: 700; font-variant-numeric: tabular-nums;
+  }
+
+  label.fld { display: block; margin-bottom: 12px; }
+  label.fld:last-child { margin-bottom: 0; }
+  .lbl { font-size: 11.5px; font-weight: 600; color: var(--ink-2); letter-spacing: .02em; display: block; margin-bottom: 5px; }
+  .lbl .opt { color: var(--ink-3); font-weight: 400; }
+  input[type="text"], textarea, select {
+    width: 100%; font-family: var(--sans); font-size: 13.5px; color: var(--ink);
+    background: var(--surface-2); border: 1px solid var(--line-strong); border-radius: 7px;
+    padding: 8px 10px; resize: vertical;
+  }
+  input[type="text"]:focus, textarea:focus, select:focus {
+    outline: 2px solid var(--accent); outline-offset: -1px; border-color: transparent;
+  }
+  textarea { min-height: 58px; line-height: 1.45; }
+  .row2 { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+  @media (max-width: 480px) { .row2 { grid-template-columns: 1fr; } }
+
+  .btn {
+    font-family: var(--sans); font-size: 13px; font-weight: 600; cursor: pointer;
+    border-radius: 7px; padding: 8px 14px; border: 1px solid var(--line-strong);
+    background: var(--surface-2); color: var(--ink); transition: border-color .12s, background .12s;
+  }
+  .btn:hover { border-color: var(--ink-3); }
+  .btn:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+  .btn.accent { background: var(--accent); color: var(--accent-ink); border-color: var(--accent); }
+  .btn.accent:hover { filter: brightness(1.06); }
+  .btn.ghost { background: transparent; }
+  .btn.sm { font-size: 12px; padding: 5px 9px; }
+  .btn-x {
+    background: transparent; border: none; color: var(--ink-3); cursor: pointer;
+    font-size: 18px; line-height: 1; padding: 2px 6px; border-radius: 5px;
+  }
+  .btn-x:hover { color: var(--accent); background: var(--surface-2); }
+
+  .cast-item, .shot-item {
+    border: 1px solid var(--line); border-radius: 8px; padding: 14px; margin-bottom: 12px; background: var(--surface-2);
+  }
+  .item-hd { display: flex; justify-content: space-between; align-items: center; gap: 8px; margin-bottom: 10px; }
+  .item-hd .tag {
+    font-size: 11px; font-weight: 700; letter-spacing: .08em; text-transform: uppercase; color: var(--ink-3);
+    display: flex; align-items: center; gap: 8px;
+  }
+  .dot { width: 8px; height: 8px; border-radius: 50%; background: var(--accent); flex: none; }
+
+  .toolbar { display: flex; gap: 8px; flex-wrap: wrap; align-items: center; }
+  .toolbar .spacer { flex: 1; }
+
+  .chip-row { display: flex; gap: 6px; flex-wrap: wrap; margin-top: 6px; }
+  .chip {
+    font-size: 11px; padding: 3px 8px; border-radius: 20px; border: 1px solid var(--line-strong);
+    background: var(--surface); color: var(--ink-2); cursor: pointer;
+  }
+  .chip:hover { border-color: var(--accent); color: var(--accent); }
+
+  .cast-checks { display: flex; flex-wrap: wrap; gap: 7px; }
+  .chk {
+    display: inline-flex; align-items: center; gap: 7px; font-size: 12.5px; color: var(--ink);
+    background: var(--surface); border: 1px solid var(--line-strong); border-radius: 7px;
+    padding: 6px 11px 6px 9px; cursor: pointer; user-select: none;
+  }
+  .chk input { accent-color: var(--accent); width: 15px; height: 15px; margin: 0; cursor: pointer; }
+  .chk.on { border-color: var(--accent); background: color-mix(in srgb, var(--accent) 9%, var(--surface)); }
+  .chk-none { font-size: 12px; color: var(--ink-3); font-style: italic; }
+  .chk-inline { width: 100%; align-items: flex-start; font-weight: 500; line-height: 1.4; margin-top: 4px; }
+  .chk-inline input { margin-top: 1px; }
+  .wardrobe-note { font-size: 11.5px; color: var(--accent); margin: 2px 0 10px; font-weight: 600; }
+  .cast-row { display: flex; align-items: center; gap: 6px; width: 100%; }
+  .cast-checks { flex-direction: column; align-items: stretch; }
+  .cast-row .chk { flex: 1; }
+  .face-toggle {
+    font-family: var(--sans); font-size: 11.5px; font-weight: 600; cursor: pointer; white-space: nowrap;
+    border: 1px solid var(--line-strong); border-radius: 7px; padding: 6px 10px; background: var(--surface); color: var(--ink-2);
+  }
+  .face-toggle:hover { border-color: var(--ink-3); }
+  .face-toggle.hidden-face { color: var(--warn); border-color: color-mix(in srgb, var(--warn) 45%, transparent); background: var(--warn-bg); }
+  .pb-head .cast-badge { font-family: var(--mono); font-size: 10px; color: var(--code-dim); }
+  .pb-head .kind {
+    font-family: var(--mono); font-size: 9.5px; font-weight: 700; letter-spacing: .08em;
+    border: 1px solid rgba(255,255,255,.18); color: var(--code-ink); border-radius: 4px; padding: 1px 5px;
+  }
+  .prompt-block.img-block { border-color: color-mix(in srgb, var(--accent) 30%, var(--line)); }
+  .prompt-block.img-block .pb-head { background: color-mix(in srgb, var(--accent) 12%, transparent); }
+  .reuse-note, .reuse-inline { font-size: 12px; color: var(--ink-2); }
+  .reuse-note { margin: -4px 0 14px; padding-left: 4px; border-left: 2px solid var(--accent); padding: 4px 0 4px 10px; }
+  .frame-fields { border-top: 1px dashed var(--line-strong); padding-top: 12px; margin-top: 4px; }
+  .reuse-inline { background: var(--surface); border: 1px dashed var(--line-strong); border-radius: 6px; padding: 7px 10px; margin-bottom: 12px; font-style: italic; }
+  .mode-note { font-size: 12px; color: var(--ink-3); margin: -6px 0 14px; line-height: 1.45; }
+
+  .warn {
+    display: flex; gap: 8px; align-items: flex-start; font-size: 12px; color: var(--warn);
+    background: var(--warn-bg); border: 1px solid color-mix(in srgb, var(--warn) 35%, transparent);
+    border-radius: 6px; padding: 7px 10px; margin-top: 8px;
+  }
+  .warn svg { flex: none; margin-top: 1px; }
+
+  .dur-wrap { display: flex; align-items: center; gap: 10px; }
+  .dur-wrap input[type="range"] { flex: 1; accent-color: var(--accent); }
+  .dur-val { font-variant-numeric: tabular-nums; font-weight: 700; font-size: 13px; min-width: 34px; }
+  .lbl-row { display: flex; align-items: center; justify-content: space-between; gap: 8px; margin-bottom: 5px; }
+  .lbl-row .lbl { margin-bottom: 0; }
+  .fit-btn { font-size: 11px; padding: 3px 9px; }
+  .fit-btn.short { color: var(--warn); border-color: color-mix(in srgb, var(--warn) 45%, transparent); }
+  .speech-est { font-size: 11.5px; color: var(--ink-3); margin-top: 5px; font-variant-numeric: tabular-nums; }
+  .speech-est.tight { color: var(--warn); font-weight: 600; }
+
+  /* Output */
+  .out-head { display: flex; align-items: baseline; justify-content: space-between; gap: 12px; margin-bottom: 12px; }
+  .out-head h2 { font-size: 12px; font-weight: 700; letter-spacing: .1em; text-transform: uppercase; color: var(--ink-2); margin: 0; }
+  .meta { font-size: 12px; color: var(--ink-3); font-variant-numeric: tabular-nums; }
+
+  .prompt-block {
+    background: var(--code-bg); border: 1px solid var(--line); border-radius: 9px;
+    margin-bottom: 14px; overflow: hidden;
+  }
+  .pb-head {
+    display: flex; align-items: center; gap: 10px; padding: 9px 12px;
+    border-bottom: 1px solid rgba(255,255,255,.07); background: rgba(255,255,255,.02);
+  }
+  .pb-head .n { font-family: var(--mono); font-size: 11px; color: var(--code-accent); font-weight: 700; }
+  .pb-head .t { font-size: 12px; color: var(--code-ink); font-weight: 600; flex: 1; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+  .pb-head .d { font-family: var(--mono); font-size: 11px; color: var(--code-dim); font-variant-numeric: tabular-nums; }
+  .copy1 {
+    font-family: var(--sans); font-size: 11px; font-weight: 600; cursor: pointer;
+    background: rgba(255,255,255,.06); color: var(--code-ink); border: 1px solid rgba(255,255,255,.12);
+    border-radius: 5px; padding: 3px 9px;
+  }
+  .copy1:hover { background: rgba(255,255,255,.13); }
+  .copy1.done { color: var(--good); border-color: var(--good); }
+  pre.code {
+    margin: 0; padding: 13px 14px; overflow-x: auto; font-family: var(--mono);
+    font-size: 12px; line-height: 1.6; color: var(--code-ink); white-space: pre; tab-size: 2;
+  }
+  pre.code .k { color: var(--code-key); }
+  pre.code .c { color: var(--code-dim); font-style: italic; }
+  pre.code .a { color: var(--code-accent); }
+
+  .empty { text-align: center; color: var(--ink-3); font-size: 13px; padding: 40px 16px; border: 1px dashed var(--line-strong); border-radius: 9px; }
+
+  .foot { margin-top: 8px; font-size: 12px; color: var(--ink-3); }
+  .foot code { font-family: var(--mono); background: var(--surface); border: 1px solid var(--line); border-radius: 4px; padding: 1px 5px; font-size: 11px; }
+
+  .theme-toggle {
+    position: fixed; top: 16px; right: 16px; z-index: 20;
+    background: var(--surface); border: 1px solid var(--line-strong); color: var(--ink-2);
+    border-radius: 7px; padding: 6px 10px; font-size: 12px; cursor: pointer; font-family: var(--sans);
+  }
+  .theme-toggle:hover { border-color: var(--ink-3); }
+
+  .tips { display: grid; grid-template-columns: 1fr 1fr; gap: 10px 22px; }
+  @media (max-width: 480px) { .tips { grid-template-columns: 1fr; } }
+  .tip { font-size: 12.5px; color: var(--ink-2); display: flex; gap: 8px; }
+  .tip b { color: var(--ink); font-weight: 600; }
+  .tip .m { color: var(--accent); font-weight: 700; }
+
+  @media (prefers-reduced-motion: reduce) { * { transition: none !important; } }
+</style>
+
+<div class="app">
+  <button class="theme-toggle" id="themeBtn" aria-label="Toggle theme">◑ Theme</button>
+  <div class="wrap">
+    <header class="hd">
+      <div class="eyebrow">Porsche WBT · Video Prompts</div>
+      <h1>Continuity Prompt Builder</h1>
+      <p class="lede">Lock your cast once, break the scene into ≤8-second beats, and generate paste-ready image + video prompts that carry identity and continuity forward — so characters stay consistent and clips stop morphing.</p>
+    </header>
+
+    <div class="grid">
+      <!-- LEFT: inputs -->
+      <div class="col-in">
+
+        <section class="card">
+          <h2><span class="step-n">1</span> Cast &amp; anchors</h2>
+          <p class="hint">Define each recurring subject once. The descriptor is pasted <b>verbatim</b> into every shot (reworded attributes are the #1 cause of morphing). Then add each subject as an <b>Ingredient</b> in Flow — a clean reference image on a plain/segmented background, no extra people, matched lighting — this is what locks identity across clips.</p>
+          <div id="castList"></div>
+          <button class="btn ghost sm" id="addCast">+ Add character / subject</button>
+        </section>
+
+        <section class="card">
+          <h2><span class="step-n">2</span> Global look</h2>
+          <p class="hint">Style, environment and guardrails shared by every shot. Environment and uniforms follow the Porsche WBT image rules.</p>
+          <label class="fld">
+            <span class="lbl">Environment <span class="opt">— canonical Porsche facility (injected into every prompt)</span></span>
+            <select id="env"></select>
+          </label>
+          <label class="fld">
+            <span class="lbl">Style &amp; grade <span class="opt">— lens / lighting / palette (your creative line)</span></span>
+            <textarea id="style" placeholder="Photoreal cinematic live-action, 35mm, shallow depth of field, muted cool grays / white / charcoal with a single Racing Red #D5001C accent; backgrounds heavily blurred."></textarea>
+          </label>
+          <label class="fld">
+            <span class="lbl">Negative / do-not <span class="opt">— defaults tuned against morphing</span></span>
+            <textarea id="neg">no face change, no wardrobe change, no extra people, no warping or melting, no color shift, no duplicated limbs, no logo distortion, no crest or shield or coat-of-arms emblem, no polo or collared shirt, no red collar or sleeve trim, no sponsor patches or logos, no added or improvised dialogue, no extra spoken words, no on-screen text, no music</textarea>
+          </label>
+          <label class="chk chk-inline" id="houseRulesWrap">
+            <input type="checkbox" id="houseRules" checked>
+            Append Porsche WBT house rules to image prompts <span class="opt">(badging, uniforms, facility, black lifts, no text)</span>
+          </label>
+        </section>
+
+        <section class="card">
+          <h2><span class="step-n">3</span> Shot beats</h2>
+          <p class="hint">One subject, one action, static camera per beat. Keep each ≤8s. Beats after the first automatically seed the previous clip's last frame.</p>
+          <div id="shotList"></div>
+          <button class="btn ghost sm" id="addShot">+ Add shot beat</button>
+        </section>
+
+        <section class="card">
+          <h2>Anti-morph checklist</h2>
+          <div class="tips">
+            <div class="tip"><span class="m">→</span><span><b>One action per clip.</b> Simultaneous actions break geometry.</span></div>
+            <div class="tip"><span class="m">→</span><span><b>Static camera.</b> Any push-in/pan/zoom makes the model warp the background.</span></div>
+            <div class="tip"><span class="m">→</span><span><b>Keep subjects in-frame.</b> Exits/returns morph on re-entry.</span></div>
+            <div class="tip"><span class="m">→</span><span><b>Seed the last frame.</b> Clip N's end frame = clip N+1's start frame — or use Extend for one continuous shot.</span></div>
+            <div class="tip"><span class="m">→</span><span><b>Verify before chaining.</b> Errors compound down the sequence.</span></div>
+            <div class="tip"><span class="m">→</span><span><b>Add Ingredients.</b> Clean character refs on a plain background lock identity across clips — the key fix.</span></div>
+            <div class="tip"><span class="m">→</span><span><b>Prompt = motion only.</b> Don't re-describe appearance the frames/ingredients already fix.</span></div>
+          </div>
+        </section>
+      </div>
+
+      <!-- RIGHT: output -->
+      <div class="col-out">
+        <section class="card">
+          <div class="out-head">
+            <h2>Generated prompts</h2>
+            <span class="meta" id="meta"></span>
+          </div>
+          <div class="toolbar" style="margin-bottom:14px;">
+            <button class="btn accent sm" id="copyAll">Copy all</button>
+            <button class="btn ghost sm" id="frameToggle">🖼 Frame mode: off</button>
+            <button class="btn ghost sm" id="loadSample">Load example</button>
+            <button class="btn ghost sm" id="clearAll">Clear</button>
+          </div>
+          <p class="mode-note" id="modeNote"></p>
+          <div id="output"></div>
+          <p class="foot">In Flow: add each character as an <b>Ingredient</b>, then per beat use <b>Frames to Video</b> (start + end frame) with the ingredients attached; reuse each clip's end frame as the next clip's start frame, or use <b>Extend</b> for one continuous shot. Keep the camera static. Saved locally in your browser.</p>
+        </section>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+(function () {
+  "use strict";
+  const $ = (s, r) => (r || document).querySelector(s);
+  const el = (t, c) => { const n = document.createElement(t); if (c) n.className = c; return n; };
+  const esc = (s) => (s || "").replace(/[&<>]/g, m => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;" }[m]));
+
+  const KEY = "omni_builder_v1";
+  let state = { cast: [], style: "", neg: "", shots: [], env: "workshop", houseRules: true };
+
+  // ---- Porsche WBT rules (from CC04 IMAGE-GEN-RULES.md / MOTION-COMIC-RULES.md) ----
+  const ROLE_LABELS = {
+    customer: "Customer / other",
+    techA: "Technician — Uniform A (bib overalls)",
+    techB: "Technician — Uniform B (all-gray)",
+    advisor: "Service advisor"
+  };
+  const WARDROBE = {
+    techA: "UNIFORM A — very dark gray bib-style mechanic OVERALLS with a BLACK bib chest panel and BLACK shoulder straps (with buckles); dark-gray legs with black reinforced panels at hips/knees/lower-leg and dark side cargo pockets; worn OVER a plain bright-red short-sleeve CREW-NECK T-SHIRT (round neck, NO collar); black safety boots. Markings on the black bib chest, and nowhere else: the PORSCHE wordmark in WHITE across the upper chest; then a few inches below it, offset to the RIGHT (not centered), the word SERVICE in RED and much smaller. ABSOLUTELY NO crest, shield, coat-of-arms or emblem; NOT a polo shirt — no collar, no buttons, no red collar or sleeve trim; no sponsor patches or other logos. Match the attached Uniform A reference image exactly.",
+    techB: "UNIFORM B — a plain gray short-sleeve CREW-NECK T-SHIRT (round neck, NO collar, NO trim) with matching gray work trousers and a thin dark belt; black safety boots. Chest completely BLANK. ABSOLUTELY NO crest, shield, emblem, wordmark, badge, number or lettering; NOT a polo — no collar, no buttons, no red trim/piping; no sponsor logos. Match the attached Uniform B reference image exactly.",
+    advisor: "Porsche service-advisor business attire — a crisp WHITE long-sleeve button-up collared DRESS SHIRT (optionally a tailored charcoal or navy blazer) with non-white slacks (charcoal, navy, gray or black) and a thin dark belt. Completely logo-free: NO PORSCHE wordmark, NO crest, shield or emblem, NO name badge, sponsor patch, number or lettering. This is a dress shirt, NOT a polo shirt; no red collar or sleeve trim, no branded polo."
+  };
+  const ENV_LABELS = {
+    custom: "Custom (use Style only)",
+    workshop: "Porsche service bay / workshop",
+    showroom: "Porsche showroom",
+    drive: "Service reception / drive"
+  };
+  const ENVIRONMENTS = {
+    custom: "",
+    workshop: "A spotless, brightly lit Porsche dealership service bay: large-format light-gray/white tile floor with darker-gray traffic borders, white walls, exposed white-painted ceiling with linear LED light strips giving even bright light. Black two-post/four-post lifts, black lift posts and black overhead service columns; red retractable hose/cable reels. Organized rolling tool cabinets and workbenches along the walls; any vehicles on lifts kept dark, generic and heavily blurred (never sharp or badged). Immaculate, premium, no clutter.",
+    showroom: "A bright, minimal, almost museum-like Porsche showroom: large-format light-gray floor tiles, white/light walls, slim round brushed-metal columns, floor-to-ceiling glass curtain walls, recessed and linear ceiling lighting, white curved minimalist reception desks. Vehicles spaced well apart and kept soft/blurred, never sharp. At most one PORSCHE wordmark high on a wall. Uncluttered and premium.",
+    drive: "A clean, premium Porsche service reception / service-drive: bright and spotless with a white curved reception desk, light-gray tile floor, white walls, slim brushed-metal columns and soft daylight. Any vehicles kept dark, generic and heavily blurred in the background. Uncluttered; at most one PORSCHE wordmark where it sits naturally on a wall."
+  };
+  // CC04 PROMPT-INJECT block (uniform wordmark treatment updated per spec: white PORSCHE + small red SERVICE on the bib)
+  const HOUSE_RULES = "HARD CONSTRAINTS — Render NO text, lettering, numbers, captions, watermarks, or UI anywhere in the image. Render NO Porsche crest, shield, or coat-of-arms emblem anywhere. The only permitted branding is the Porsche wordmark (the word PORSCHE); it MAY appear where it sits naturally — on a background wall (plain white or black to contrast), and on the black bib chest of a technician's Uniform A where it reads PORSCHE in white with the word SERVICE in red, much smaller, a few inches below and offset to the right — correctly spelled and clean. Render NO other badges, emblems, model lettering, or dealer sign-text on vehicles, clothing, or signage (a vehicle's factory-correct rear PORSCHE lettering is acceptable when accurate). ACCURACY — If a Porsche vehicle appears, its proportions, body panels, panel gaps, lighting signature, wheels, brakes, and part placement must be accurate to a real current production model; never invent trim, badges, or bodywork. If a dealership, showroom, service reception, or workshop appears, it must look like a real, correctly-equipped current Porsche facility: bright and spotless, large-format light-gray tile floors, white walls, slim round brushed-metal columns, recessed/linear lighting, vehicles spaced apart. ANY vehicle lift, lift post, or overhead service column is BLACK (never red, yellow, or blue); retractable hose/cable reels may be red. People wear clean, appropriate workwear and PPE; any Porsche technician wears one of the two approved technician uniforms, and any Porsche service advisor wears the advisor business attire, exactly as described in the prompt. Photorealistic, physically plausible, professional editorial quality.";
+
+  // ---- persistence ----
+  function save() {
+    state.style = $("#style").value;
+    state.neg = $("#neg").value;
+    if ($("#env")) state.env = $("#env").value;
+    if ($("#houseRules")) state.houseRules = $("#houseRules").checked;
+    try { localStorage.setItem(KEY, JSON.stringify(state)); } catch (e) {}
+    render();
+  }
+  function load() {
+    try {
+      const raw = localStorage.getItem(KEY);
+      if (raw) { const p = JSON.parse(raw); if (p && p.cast) state = p; }
+    } catch (e) {}
+    // migrate old single-subject model -> cast array (who's in frame)
+    (state.shots || []).forEach(s => {
+      if (!Array.isArray(s.cast)) {
+        if (s.subj === "__ALL__") s.cast = state.cast.map(c => c.name || "");
+        else if (s.subj) s.cast = [s.subj];
+        else s.cast = [];
+        delete s.subj;
+      }
+      if (!s.faces || typeof s.faces !== "object") { s.faces = {}; (s.cast || []).forEach(nm => s.faces[nm] = true); }
+      if (typeof s.line !== "string") s.line = "";
+      if (typeof s.speaker !== "string") s.speaker = "";
+      if (typeof s.open !== "string") s.open = "";
+      if (typeof s.close !== "string") s.close = "";
+    });
+    (state.cast || []).forEach(c => { if (!ROLE_LABELS[c.role]) c.role = "customer"; });
+    if (typeof state.frameMode !== "boolean") state.frameMode = false;
+    if (!(state.env in ENVIRONMENTS)) state.env = "custom";
+    if (typeof state.houseRules !== "boolean") state.houseRules = true;
+  }
+
+  // ---- cast ----
+  function addCast(data) {
+    state.cast.push(Object.assign({ id: Date.now() + Math.random(), name: "", desc: "", ref: "", role: "customer" }, data || {}));
+  }
+  function renderCast() {
+    const box = $("#castList"); box.innerHTML = "";
+    state.cast.forEach((c, i) => {
+      const wrap = el("div", "cast-item");
+      const hd = el("div", "item-hd");
+      hd.innerHTML = '<span class="tag"><span class="dot"></span>' + (c.name ? esc(c.name) : "Subject " + (i + 1)) + "</span>";
+      const x = el("button", "btn-x"); x.textContent = "×"; x.title = "Remove";
+      x.onclick = () => { state.cast.splice(i, 1); save(); };
+      hd.appendChild(x); wrap.appendChild(hd);
+
+      wrap.appendChild(field("Name / label", "text", c.name, "Alex (Technician)", v => c.name = v));
+
+      // role — drives the approved wardrobe (technicians get exactly one of two uniforms)
+      const roleL = el("label", "fld");
+      roleL.innerHTML = '<span class="lbl">Role &amp; wardrobe <span class="opt">— sets Porsche-approved attire</span></span>';
+      const roleSel = el("select");
+      Object.keys(ROLE_LABELS).forEach(k => { const o = el("option"); o.value = k; o.textContent = ROLE_LABELS[k]; if (k === c.role) o.selected = true; roleSel.appendChild(o); });
+      roleSel.onchange = () => { c.role = roleSel.value; save(); };
+      roleL.appendChild(roleSel); wrap.appendChild(roleL);
+
+      const techRole = c.role === "techA" || c.role === "techB" || c.role === "advisor";
+      wrap.appendChild(field("Locked descriptor (verbatim every shot)" + (techRole ? " <span class=\"opt\">— face, hair, body, age only; wardrobe comes from the uniform above</span>" : ""), "area", c.desc,
+        techRole ? "Man, early 30s, short dark hair, light stubble, warm approachable face, athletic build." : "Woman, late 40s, shoulder-length auburn hair, tortoiseshell glasses, camel wool coat.", v => c.desc = v));
+      if (techRole) { const w = el("div", "wardrobe-note"); w.textContent = "Wardrobe locked to " + ROLE_LABELS[c.role] + " — injected into every prompt."; wrap.appendChild(w); }
+
+      wrap.appendChild(field("Ingredients — reference images <span class=\"opt\">— plain/segmented background, no extra people, consistent look</span>", "text", c.ref,
+        techRole ? "Ptech-03.jpeg (face) + " + (c.role === "techB" ? "Uniform-B.jpg" : "Uniform-A.jpg") + " (attach both)" : "dana_front.png (plain bg) + dana_34.png", v => c.ref = v));
+      box.appendChild(wrap);
+    });
+  }
+
+  // ---- shots ----
+  const CAM = ["Static locked-off", "Slow push-in", "Slow pull-back", "Gentle handheld", "Left-to-right pan", "Low-angle rise", "Over-the-shoulder", "Slow orbit (¼)"];
+  function addShot(data) {
+    state.shots.push(Object.assign({ id: Date.now() + Math.random(), title: "", cast: [], faces: {}, action: "", line: "", speaker: "", open: "", close: "", cam: "Static locked-off", dur: 8, cont: "" }, data || {}));
+  }
+  function renderShots() {
+    const box = $("#shotList"); box.innerHTML = "";
+    state.shots.forEach((s, i) => {
+      const wrap = el("div", "shot-item");
+      const hd = el("div", "item-hd");
+      hd.innerHTML = '<span class="tag"><span class="dot"></span>Beat ' + String(i + 1).padStart(2, "0") + "</span>";
+      const ctrl = el("div"); ctrl.style.display = "flex"; ctrl.style.gap = "4px";
+      if (i > 0) { const up = mkMove("↑", () => { swap(i, i - 1); }); ctrl.appendChild(up); }
+      if (i < state.shots.length - 1) { const dn = mkMove("↓", () => { swap(i, i + 1); }); ctrl.appendChild(dn); }
+      const x = el("button", "btn-x"); x.textContent = "×"; x.title = "Remove";
+      x.onclick = () => { state.shots.splice(i, 1); save(); };
+      ctrl.appendChild(x); hd.appendChild(ctrl); wrap.appendChild(hd);
+
+      wrap.appendChild(field("Beat title", "text", s.title, "Greeting at the service desk", v => s.title = v));
+
+      // who's in frame — every present character, not just the one acting
+      const whoL = el("label", "fld");
+      whoL.innerHTML = '<span class="lbl">Who’s in frame <span class="opt">— tick <b>everyone</b> present, not just the one acting</span></span>';
+      const checks = el("div", "cast-checks");
+      if (!state.cast.length) {
+        const n = el("span", "chk-none"); n.textContent = "Add a character in step 1 first.";
+        checks.appendChild(n);
+      } else {
+        state.cast.forEach((c, ci) => {
+          const nm = c.name || ("Subject " + (ci + 1));
+          const on = s.cast.indexOf(nm) >= 0;
+          const row = el("div", "cast-row");
+          const lab = el("label", "chk" + (on ? " on" : ""));
+          const cb = el("input"); cb.type = "checkbox"; cb.checked = on;
+          cb.onchange = () => {
+            const idx = s.cast.indexOf(nm);
+            if (cb.checked && idx < 0) { s.cast.push(nm); if (!(nm in s.faces)) s.faces[nm] = true; }
+            else if (!cb.checked && idx >= 0) s.cast.splice(idx, 1);
+            save();
+          };
+          lab.appendChild(cb); lab.appendChild(document.createTextNode(nm));
+          row.appendChild(lab);
+          if (on) {
+            const faceOn = s.faces[nm] !== false;
+            const ft = el("button", "face-toggle" + (faceOn ? "" : " hidden-face"));
+            ft.type = "button";
+            ft.textContent = faceOn ? "🙂 face shown" : "🙈 face hidden";
+            ft.title = "Is this character’s face clearly visible in this beat? Needed to lock identity when carried into later beats.";
+            ft.onclick = () => { s.faces[nm] = !faceOn; save(); };
+            row.appendChild(ft);
+          }
+          checks.appendChild(row);
+        });
+      }
+      whoL.appendChild(checks); wrap.appendChild(whoL);
+
+      wrap.appendChild(field("Camera (one move)", "select-cam", s.cam, "", v => s.cam = v));
+
+      wrap.appendChild(field("Action (one subject, one action)", "area", s.action,
+        "Dana walks up to the counter and sets her key fob down.", v => s.action = v));
+
+      // dialogue: who speaks + the spoken line (drives clip timing)
+      const inFrame = (s.cast || []).filter(nm => castByName(nm));
+      const spkL = el("label", "fld");
+      spkL.innerHTML = '<span class="lbl">Who speaks? <span class="opt">— leave blank for no dialogue</span></span>';
+      const spkSel = el("select");
+      const noneO = el("option"); noneO.value = ""; noneO.textContent = "— no dialogue —"; spkSel.appendChild(noneO);
+      inFrame.forEach(nm => { const o = el("option"); o.value = nm; o.textContent = nm; if (nm === s.speaker) o.selected = true; spkSel.appendChild(o); });
+      spkSel.onchange = () => { s.speaker = spkSel.value; save(); };
+      spkL.appendChild(spkSel); wrap.appendChild(spkL);
+
+      const lineL = el("label", "fld");
+      lineL.innerHTML = '<span class="lbl">Spoken line <span class="opt">— what the character says, in their own words</span></span>';
+      const lineTa = el("textarea");
+      lineTa.value = s.line || "";
+      lineTa.placeholder = "Hello, my car is pulling to the left when I begin to press the brake pedal.";
+      const est = el("div", "speech-est");
+      const paintEst = (txt) => {
+        const need = speechSeconds(txt);
+        if (!need) { est.textContent = ""; est.classList.remove("tight"); return; }
+        est.textContent = "≈ " + need.toFixed(1) + "s to speak (" + wordCount(txt) + " words) · this beat is " + s.dur + "s";
+        est.classList.toggle("tight", need > s.dur || need > 10);
+      };
+      lineTa.addEventListener("input", () => { s.line = lineTa.value; paintEst(lineTa.value); });
+      lineTa.addEventListener("blur", save);
+      lineL.appendChild(lineTa); lineL.appendChild(est); paintEst(s.line);
+      wrap.appendChild(lineL);
+
+      // duration slider (+ fit-to-line when there's dialogue)
+      const need = speechSeconds(s.line);
+      const durL = el("label", "fld");
+      const lr = el("div", "lbl-row");
+      lr.innerHTML = '<span class="lbl">Duration <span class="opt">— hard cap 8s (Veo)</span></span>';
+      if (need > 0) {
+        const sugg = Math.min(8, Math.max(2, Math.ceil(need)));
+        const fit = el("button", "btn ghost sm fit-btn" + (s.dur < need ? " short" : ""));
+        fit.type = "button"; fit.textContent = "Fit to line (" + sugg + "s)";
+        fit.title = "Set this beat's length to fit the spoken line at a natural pace.";
+        fit.onclick = () => { s.dur = sugg; save(); };
+        lr.appendChild(fit);
+      }
+      durL.appendChild(lr);
+      const dw = el("div", "dur-wrap");
+      const rng = el("input"); rng.type = "range"; rng.min = 2; rng.max = 8; rng.step = 1; rng.value = s.dur;
+      const val = el("span", "dur-val"); val.textContent = s.dur + "s";
+      rng.oninput = () => { val.textContent = rng.value + "s"; };
+      rng.onchange = () => { s.dur = +rng.value; save(); };
+      dw.appendChild(rng); dw.appendChild(val); durL.appendChild(dw); wrap.appendChild(durL);
+
+      if (i > 0) {
+        wrap.appendChild(field("Continuity carry-over <span class=\"opt\">— what persists from previous beat</span>", "text", s.cont,
+          "same desk, same lighting, customer already seated", v => s.cont = v));
+      }
+
+      // start/end frame descriptions (only relevant in frame mode)
+      if (state.frameMode) {
+        const fm = el("div", "frame-fields");
+        if (i === 0) fm.appendChild(field("Opening frame <span class=\"opt\">— the still at the START of this clip</span>", "area", s.open,
+          "Alex behind the counter, looking up from his tablet toward the customer, warm expression.", v => s.open = v));
+        else {
+          const n = el("div", "reuse-inline"); n.innerHTML = "Start frame reuses Beat " + pad(i - 1) + "’s closing frame — no need to re-describe it. (Same continuous shot? Use Flow’s Extend instead.)";
+          fm.appendChild(n);
+        }
+        fm.appendChild(field("Closing frame <span class=\"opt\">— the still at the END of this clip</span>", "area", s.close,
+          "Dana standing at the counter, key fob set down, mid-sentence; Alex listening.", v => s.close = v));
+        wrap.appendChild(fm);
+      }
+
+      // warnings
+      const warns = shotWarnings(s, i);
+      warns.forEach(w => wrap.appendChild(warnEl(w)));
+
+      box.appendChild(wrap);
+    });
+  }
+  function mkMove(sym, fn) { const b = el("button", "btn-x"); b.textContent = sym; b.style.fontSize = "13px"; b.onclick = fn; return b; }
+  function swap(a, b) { const t = state.shots[a]; state.shots[a] = state.shots[b]; state.shots[b] = t; save(); }
+
+  function shotWarnings(s, i) {
+    const out = [];
+    const a = (s.action || "").toLowerCase();
+    if (/\b(and then|then|after that|afterwards|followed by|while |simultaneously|as (he|she|they|the))\b/.test(a))
+      out.push("Reads like more than one action — a lone “and” is fine, but sequence words (“then”, “while”, “after”) mean two actions. Split them into separate beats to avoid geometry drift.");
+    if (!s.cast || !s.cast.length) out.push("No one in frame — tick every character present so their identity locks are injected.");
+    if (s.cam && s.cam !== "Static locked-off") out.push("Repo pipeline uses a STATIC camera on every shot — “" + s.cam + "” makes the model warp/morph the background. Use Static locked-off unless you have a specific reason.");
+    // dialogue timing: is the clip long enough to say the line?
+    const need = speechSeconds(s.line);
+    if (need > 0) {
+      const line = cleanLine(s.line);
+      const shortLine = line.length > 42 ? line.slice(0, 42) + "…" : line;
+      if (need > 8.001) {
+        out.push("“" + shortLine + "” needs ≈" + need.toFixed(1) + "s to say, but clips cap at 8s. Shorten the line, or split it across two beats (e.g. end one beat mid-thought and continue in the next).");
+      } else if (s.dur < need) {
+        out.push("“" + shortLine + "” needs ≈" + need.toFixed(1) + "s to say at a natural pace, but this beat is only " + s.dur + "s — the line will get rushed or cut. Raise it to about " + Math.ceil(need) + "s (use “Fit to line”).");
+      }
+      const spk = speaksIn(s);
+      if (spk && (s.faces || {})[spk] === false)
+        out.push(spk + " has a spoken line but their face is marked hidden here — lip-sync won’t be visible. Show their face for the line to read as spoken.");
+      // single-person rule: extra people in a speaking shot cause wrong-mouth / extra-voice renders
+      const others = (s.cast || []).filter(nm => castByName(nm) && nm !== spk);
+      if (others.length)
+        out.push("Speaking beat: keep only the speaker (" + (spk || "?") + ") in frame — " + others.join(", ") + " in the shot makes the model put the line on the wrong mouth or add a second voice. Make it a single-person close-up and give reactions their own silent beat.");
+      // naming an off-screen character makes the model conjure AND voice them
+      const hay = ((s.action || "") + " " + (s.open || "") + " " + (s.close || "")).toLowerCase();
+      const tok = nm => (nm || "").split(/[ (]/)[0].toLowerCase();
+      const named = state.cast.map(c => c.name).filter(nm => nm && nm !== spk && (s.cast || []).indexOf(nm) < 0)
+        .filter(nm => { const t = tok(nm); return t.length > 2 && new RegExp("\\b" + t.replace(/[.*+?^${}()|[\]\\]/g, "\\$&") + "\\b").test(hay); });
+      if (named.length)
+        out.push("This speaking beat names " + named.join(", ") + " (off-screen) in its action/frame text — naming another character makes the model conjure and voice them. Describe them obliquely instead, e.g. “looks slightly off to one side”.");
+    }
+    // face-lock check: a carried-over character with no clean face shown yet and no Avatar has nothing to lock onto
+    (s.cast || []).filter(nm => castByName(nm) && firstBeatOf(nm) < i).forEach(nm => {
+      if (lastFaceBeat(nm, i) < 0 && !hasIngredientRef(castByName(nm)))
+        out.push(nm + " is carried in from an earlier beat, but their face was never clearly shown and they have no Ingredient reference — the seeded frame gives the model nothing to lock onto, so it may invent a new face. Add them as an Ingredient (clean reference image) or show their face in an earlier beat.");
+    });
+    // this beat itself: face hidden + no Avatar, and they reappear later -> weak anchor to seed forward
+    (s.cast || []).filter(nm => castByName(nm) && (s.faces || {})[nm] === false && !hasIngredientRef(castByName(nm))).forEach(nm => {
+      const returnsLater = state.shots.some((sh, j) => j > i && (sh.cast || []).indexOf(nm) >= 0);
+      if (returnsLater && lastFaceBeat(nm, i) < 0 && !faceVisibleIn(nm, i))
+        out.push(nm + "’s face is hidden here and hasn’t been shown yet — they reappear in a later beat, so there’s no clean frame to carry forward. Show their face in this or an earlier beat.");
+    });
+    return out;
+  }
+  function warnEl(txt) {
+    const w = el("div", "warn");
+    w.innerHTML = '<svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4"><path d="M12 9v4M12 17h.01M10.3 3.9 1.8 18a2 2 0 0 0 1.7 3h17a2 2 0 0 0 1.7-3L13.7 3.9a2 2 0 0 0-3.4 0Z"/></svg><span>' + esc(txt) + "</span>";
+    return w;
+  }
+
+  // ---- generic field factory ----
+  function field(labelHtml, type, value, ph, onchange) {
+    const l = el("label", "fld");
+    const sp = el("span", "lbl"); sp.innerHTML = labelHtml; l.appendChild(sp);
+    let input;
+    if (type === "area") { input = el("textarea"); input.value = value || ""; input.placeholder = ph || ""; }
+    else if (type === "select-cam") {
+      input = el("select");
+      CAM.forEach(c => { const o = el("option"); o.value = c; o.textContent = c; if (c === value) o.selected = true; input.appendChild(o); });
+    } else { input = el("input"); input.type = "text"; input.value = value || ""; input.placeholder = ph || ""; }
+    const ev = (type === "area" || type === "text") ? "input" : "change";
+    input.addEventListener(ev, () => { onchange(input.value); if (ev === "change") save(); });
+    if (ev === "input") input.addEventListener("blur", save);
+    l.appendChild(input);
+    return l;
+  }
+
+  // ---- prompt assembly ----
+  // name -> cast object
+  function castByName(nm) { return state.cast.find(c => (c.name || "") === nm); }
+  // approved wardrobe line for a character, or null (customers use their descriptor)
+  function wardrobeLine(nm) { const c = castByName(nm); return c && WARDROBE[c.role] ? "WARDROBE — " + nm + ": " + WARDROBE[c.role] : null; }
+  function envText() { return ENVIRONMENTS[state.env] || ""; }
+  // first beat index in which a character appears (for returning vs. new)
+  function firstBeatOf(nm) {
+    for (let j = 0; j < state.shots.length; j++) if ((state.shots[j].cast || []).indexOf(nm) >= 0) return j;
+    return -1;
+  }
+  const pad = n => String(n + 1).padStart(2, "0");
+  // is nm's face marked visible in beat j (and present there)?
+  function faceVisibleIn(nm, j) { const sh = state.shots[j]; return sh && (sh.cast || []).indexOf(nm) >= 0 && (sh.faces || {})[nm] !== false; }
+  // latest beat before `before` where nm's face was clearly shown; -1 if never
+  function lastFaceBeat(nm, before) { for (let j = before - 1; j >= 0; j--) if (faceVisibleIn(nm, j)) return j; return -1; }
+  const hasIngredientRef = c => c && c.ref && c.ref.trim(); // any attached Ingredient reference anchors identity
+  // static-camera guard (repo rule: camera moves make the model warp/morph the background)
+  function camGuard(s) {
+    return s.cam === "Static locked-off"
+      ? "locked-off, COMPLETELY STATIC camera — no push-in, zoom, pan or camera move; the background stays completely static and unchanged (do NOT warp, morph, slide, regenerate or add detail to it); only the subject(s) move"
+      : s.cam.toLowerCase() + " — ONE slow, single camera move only; keep the background stable, do not warp or morph it";
+  }
+  // --- dialogue timing ---
+  const WPS = 2.5; // natural, unhurried on-camera pace (~150 wpm)
+  const LEAD = 0.5; // lead-in + tail buffer, seconds
+  function cleanLine(t) { return (t || "").replace(/[“”"']/g, "").trim(); }
+  function wordCount(t) { const c = cleanLine(t); return c ? c.split(/\s+/).filter(Boolean).length : 0; }
+  function speechSeconds(t) { const w = wordCount(t); return w ? w / WPS + LEAD : 0; }
+  function speaksIn(s) { // resolve who is speaking this beat
+    const inFrame = (s.cast || []).filter(nm => castByName(nm));
+    if (s.speaker && inFrame.indexOf(s.speaker) >= 0) return s.speaker;
+    if ((s.line || "").trim() && inFrame.length === 1) return inFrame[0];
+    return s.speaker || "";
+  }
+  // dialogue lines for a beat — enforces single-speaker, verbatim, no extra voices (the "added words" fix)
+  function speakerBlock(s) {
+    if (!(s.line && s.line.trim())) return [];
+    const spk = speaksIn(s) || "(speaker)";
+    return [
+      "SHOT: single-person close-up of " + spk + " ONLY — exactly one person in frame. Add, show, or voice NO other person; no other character speaks, and no one else is named or referenced.",
+      'DIALOGUE — ' + spk + ' says, VERBATIM: "' + cleanLine(s.line) + '"',
+      "DELIVERY: " + spk + " speaks ONLY these exact words — no added greetings, filler, paraphrase, extra sentences, second voice, or voice-over. Natural, unhurried pace with accurate lip-sync, spread across the full " + s.dur + "s so the line starts near the beginning and finishes before the clip ends."
+    ];
+  }
+
+  function buildPrompt(s, i) {
+    const names = (s.cast || []).filter(nm => castByName(nm));
+    // returning characters (seen in an earlier beat) come first so the model prioritizes preserving them
+    const returning = names.filter(nm => firstBeatOf(nm) < i);
+    const fresh = names.filter(nm => firstBeatOf(nm) === i);
+    const ordered = returning.concat(fresh);
+
+    const L = [];
+    L.push("[LOCKED]");
+    if (ordered.length) {
+      ordered.forEach(nm => {
+        const c = castByName(nm);
+        L.push("CHARACTER — " + nm + ": " + (c.desc || "(no descriptor)").trim());
+        const w = wardrobeLine(nm); if (w) L.push(w);
+        if (c.ref && c.ref.trim()) L.push("INGREDIENT — " + nm + ": " + c.ref.trim());
+      });
+    } else {
+      L.push("CHARACTER: (tick who’s in frame for Beat " + pad(i) + ")");
+    }
+    if (envText()) L.push("ENVIRONMENT: " + envText());
+    if (state.style && state.style.trim()) L.push("STYLE: " + state.style.trim());
+    if (state.neg && state.neg.trim()) L.push("NEGATIVE: " + state.neg.trim());
+    L.push("");
+    L.push("[SHOT " + pad(i) + (s.title ? " — " + s.title : "") + "]");
+    L.push("DURATION: " + s.dur + "s (max 8s)");
+    L.push("CAMERA: " + camGuard(s) + ".");
+    L.push("ACTION: " + ((s.action || "(describe one action)").trim()));
+    L.push("INPUTS RULE: appearance and wardrobe are FIXED by the INGREDIENT references above — describe only action and motion; do not contradict or re-describe what the ingredients already show.");
+
+    speakerBlock(s).forEach(x => L.push(x));
+
+    if (i === 0) {
+      L.push("CONTINUITY: establishing shot — hold every character exactly to their INGREDIENT references.");
+    } else {
+      const carry = s.cont && s.cont.trim() ? s.cont.trim() : "keep the same set, framing and lighting from Beat " + pad(i - 1);
+      L.push("CONTINUITY: continue directly from the FINAL FRAME of Beat " + pad(i - 1) + " — attach that frame as the first/reference frame; " + carry + ".");
+    }
+    // per-character identity locks — the fix for a carried-over character morphing
+    returning.forEach(nm => {
+      const c = castByName(nm);
+      const ref = c.ref && c.ref.trim() ? " Re-attach " + c.ref.trim() + "." : "";
+      const fb = lastFaceBeat(nm, i);
+      const faceClause = fb >= 0 ? " Face clearly established in Beat " + pad(fb) + " — match it exactly." : "";
+      L.push("IDENTITY LOCK — " + nm + ": the SAME individual already on screen since Beat " + pad(firstBeatOf(nm)) + ". Reuse the exact face, hair and wardrobe — do not replace or restyle." + faceClause + ref);
+    });
+    fresh.forEach(nm => {
+      if (i === 0) return;
+      L.push("INTRODUCE — " + nm + ": new to frame this beat; match their INGREDIENT reference exactly.");
+    });
+    return L.join("\n");
+  }
+
+  // ---- Start/End frame mode: still-image prompts + interpolation video prompt ----
+  function stillPrompt(s, i, which) {
+    const names = (s.cast || []).filter(nm => castByName(nm));
+    const comp = (which === "start" ? s.open : s.close) || "";
+    const L = [];
+    L.push("[IMAGE — Beat " + pad(i) + " " + (which === "start" ? "START" : "END") + " FRAME]");
+    names.forEach(nm => {
+      const c = castByName(nm);
+      L.push("SUBJECT — " + nm + ": " + (c.desc || "(no descriptor)").trim());
+      const w = wardrobeLine(nm); if (w) L.push(w);
+    });
+    names.forEach(nm => { const c = castByName(nm); if (c.ref && c.ref.trim()) L.push("INGREDIENT — " + nm + ": " + c.ref.trim()); });
+    if (envText()) L.push("ENVIRONMENT: " + envText());
+    if (state.style && state.style.trim()) L.push("SCENE: " + state.style.trim());
+    L.push("FRAMING: single photographic still — " + s.cam.toLowerCase() + " (" + (which === "start" ? "opening" : "closing") + " of the move); faces sharp and clearly lit.");
+    L.push("COMPOSITION: " + (comp.trim() || "(describe exactly what is on screen at the " + which + " of this clip — pose, position, expression)"));
+    L.push("NEGATIVE: match each character to their INGREDIENT reference exactly; no face change, no wardrobe change, no extra people, no distortion.");
+    if (state.houseRules) { L.push(""); L.push("[HOUSE RULES — Porsche WBT]"); L.push(HOUSE_RULES); }
+    return L.join("\n");
+  }
+  function videoFramePrompt(s, i) {
+    const names = (s.cast || []).filter(nm => castByName(nm));
+    const L = [];
+    L.push("[VIDEO — Beat " + pad(i) + (s.title ? " — " + s.title : "") + "]");
+    L.push("DURATION: " + s.dur + "s (max 8s)");
+    L.push("FIRST FRAME: attach the Beat " + pad(i) + " START-frame image" + (i > 0 ? " (this is Beat " + pad(i - 1) + "’s end frame — reuse it)" : "") + ".");
+    L.push("LAST FRAME: attach the Beat " + pad(i) + " END-frame image.");
+    const vrefs = names.map(nm => castByName(nm)).filter(c => c && c.ref && c.ref.trim()).map(c => c.ref.trim());
+    if (vrefs.length) L.push("INGREDIENTS: also attach " + vrefs.join("; ") + " to lock identity through the whole clip (Flow → Ingredients).");
+    L.push("MOTION: " + ((s.action || "(describe the movement between the two frames)").trim()) + " — interpolate smoothly between the two attached frames.");
+    L.push("CAMERA: " + camGuard(s) + ".");
+    L.push("HOLD: keep every character identical to the two attached frames + ingredients — do not restyle faces, hair or wardrobe.");
+    L.push("INPUTS RULE: appearance, wardrobe and setting are FIXED by the attached frames + ingredients; this prompt describes ONLY the motion between the two frames — do not add, restyle, or introduce anything they don't show.");
+    speakerBlock(s).forEach(x => L.push(x));
+    if (state.neg && state.neg.trim()) L.push("NEGATIVE: " + state.neg.trim());
+    return L.join("\n");
+  }
+
+  function highlight(txt) {
+    return esc(txt)
+      .replace(/^(\[[^\]]+\])$/gm, '<span class="a">$1</span>')
+      .replace(/^([A-Z][A-Z ]+(?: — [^:]+)?):/gm, '<span class="k">$1</span>:')
+      .replace(/\(max 8s\)/g, '<span class="c">(max 8s)</span>')
+      .replace(/(single move only)/g, '<span class="c">$1</span>');
+  }
+
+  function render() {
+    renderCast(); renderShots();
+    const ftb = $("#frameToggle"); if (ftb) { ftb.textContent = "🖼 Frame mode: " + (state.frameMode ? "on" : "off"); ftb.classList.toggle("accent", state.frameMode); ftb.classList.toggle("ghost", !state.frameMode); }
+    const mn = $("#modeNote");
+    if (mn) mn.textContent = state.frameMode
+      ? "Frame mode: for each clip, render its start & end still (each clip’s end frame is reused as the next clip’s start), then give Omni both stills + the motion prompt. Identity is locked by the images."
+      : "Ingredients mode: one video prompt per clip, characters locked by descriptor + reference. Switch to Frame mode for the tightest consistency.";
+    const out = $("#output"); out.innerHTML = "";
+    if (!state.shots.length) {
+      const e = el("div", "empty"); e.textContent = "Add a shot beat (step 3) to generate prompts. Or load the example to see the pattern.";
+      out.appendChild(e);
+      $("#meta").textContent = "";
+      return;
+    }
+    let total = 0;
+    state.shots.forEach((s, i) => {
+      total += s.dur;
+      const inFrame = (s.cast || []).filter(nm => castByName(nm))
+        .map(nm => firstBeatOf(nm) < i ? nm + " 🔒" : nm).join(", ");
+      const badge = inFrame ? ' <span class="cast-badge">· ' + esc(inFrame) + '</span>' : "";
+      if (state.frameMode) {
+        // one image per new frame (beat 1 needs a start too), then the interpolation video prompt
+        if (i === 0) out.appendChild(promptBlock("🖼", "START", esc(s.title || "Untitled") + " — start frame", "", stillPrompt(s, i, "start")));
+        else {
+          const note = el("div", "reuse-note");
+          note.innerHTML = "↑ Start frame = <b>reuse Beat " + pad(i - 1) + "’s end-frame image</b> (the seam that keeps continuity) — or, if this beat continues the SAME shot with no cut, use Flow’s <b>Extend</b> from the previous clip instead.";
+          out.appendChild(note);
+        }
+        out.appendChild(promptBlock("🖼", "END", esc(s.title || "Untitled") + " — end frame", "", stillPrompt(s, i, "end")));
+        out.appendChild(promptBlock(String(i + 1).padStart(2, "0"), "🎬", esc(s.title || "Untitled beat") + badge, s.dur + "s", videoFramePrompt(s, i)));
+      } else {
+        out.appendChild(promptBlock(String(i + 1).padStart(2, "0"), "", esc(s.title || "Untitled beat") + badge, s.dur + "s", buildPrompt(s, i)));
+      }
+    });
+    $("#meta").textContent = state.shots.length + " beat" + (state.shots.length > 1 ? "s" : "") + " · " + total + "s total" + (state.frameMode ? " · frame mode" : "");
+  }
+  // build one output block (header + copyable code)
+  function promptBlock(nLabel, kind, titleHtml, durLabel, txt) {
+    const block = el("div", "prompt-block" + (kind === "START" || kind === "END" ? " img-block" : ""));
+    const hd = el("div", "pb-head");
+    hd.innerHTML = '<span class="n">' + esc(nLabel) + '</span>' + (kind && kind !== "🎬" ? '<span class="kind">' + esc(kind) + '</span>' : "") +
+      '<span class="t">' + titleHtml + '</span>' + (durLabel ? '<span class="d">' + esc(durLabel) + '</span>' : "");
+    const cp = el("button", "copy1"); cp.textContent = "Copy";
+    cp.onclick = () => { copy(txt); cp.textContent = "Copied ✓"; cp.classList.add("done"); setTimeout(() => { cp.textContent = "Copy"; cp.classList.remove("done"); }, 1400); };
+    hd.appendChild(cp); block.appendChild(hd);
+    const pre = el("pre", "code"); pre.innerHTML = highlight(txt); block.appendChild(pre);
+    return block;
+  }
+
+  function fullText() {
+    if (!state.frameMode)
+      return state.shots.map((s, i) => "═══ BEAT " + pad(i) + " ═══\n" + buildPrompt(s, i)).join("\n\n\n");
+    return state.shots.map((s, i) => {
+      const parts = ["═══ BEAT " + pad(i) + " ═══"];
+      if (i === 0) parts.push(stillPrompt(s, i, "start"));
+      else parts.push("(START FRAME = reuse Beat " + pad(i - 1) + "'s end-frame image — or Extend the previous clip if it's one continuous shot)");
+      parts.push(stillPrompt(s, i, "end"));
+      parts.push(videoFramePrompt(s, i));
+      return parts.join("\n\n");
+    }).join("\n\n\n");
+  }
+  function copy(t) {
+    if (navigator.clipboard && navigator.clipboard.writeText) navigator.clipboard.writeText(t).catch(() => fallbackCopy(t));
+    else fallbackCopy(t);
+  }
+  function fallbackCopy(t) {
+    const ta = el("textarea"); ta.value = t; ta.style.position = "fixed"; ta.style.opacity = "0";
+    document.body.appendChild(ta); ta.select(); try { document.execCommand("copy"); } catch (e) {} document.body.removeChild(ta);
+  }
+
+  // ---- sample ----
+  function sample() {
+    state = {
+      env: "drive",
+      houseRules: true,
+      frameMode: state.frameMode,
+      style: "Photoreal cinematic live-action, 35mm, shallow depth of field, muted cool grays / white / charcoal with a single Racing Red #D5001C accent; soft daylight; backgrounds heavily blurred.",
+      neg: "no face change, no wardrobe change, no extra people, no warping or melting, no color shift, no duplicated limbs, no logo distortion, no crest or shield or coat-of-arms emblem, no polo or collared shirt, no red collar or sleeve trim, no sponsor patches or logos, no added or improvised dialogue, no extra spoken words, no on-screen text, no music",
+      cast: [
+        { id: 1, name: "Alex (Technician)", role: "techA", desc: "Man, early 30s, short dark hair, light stubble, warm approachable face, athletic build.", ref: "Ptech-03.jpeg (face) + Uniform-A.jpg (attach both)" },
+        { id: 2, name: "Dana (Customer)", role: "customer", desc: "Woman, late 40s, camel wool coat over a cream blouse, shoulder-length auburn hair, tortoiseshell glasses, holding a car key fob.", ref: "ref stills: dana_front.png, dana_34.png" }
+      ],
+      shots: [
+        { id: 11, title: "Alex at the counter", cast: ["Alex (Technician)"], faces: { "Alex (Technician)": true }, cam: "Static locked-off", dur: 7, action: "Alex looks up from his service tablet and meets the camera with a brief smile.", open: "Alex behind the service counter, head down, focused on his tablet; empty counter in front of him.", close: "Alex has looked up from the tablet, meeting the camera with a warm, brief smile; hands resting on the counter.", cont: "" },
+        { id: 12, title: "Dana explains the problem (close-up)", cast: ["Dana (Customer)"], faces: { "Dana (Customer)": true }, cam: "Static locked-off", dur: 7, action: "Dana faces the camera and explains her concern, eyes flicking slightly off to one side.", line: "Hello, my car is pulling to the left when I begin to press the brake pedal.", speaker: "Dana (Customer)", open: "Close-up of Dana at the counter, beginning to speak, one hand resting near her key fob.", close: "Dana mid-sentence, calm but concerned, looking slightly off to one side.", cont: "same counter and daylight" },
+        { id: 13, title: "Alex helps Dana", cast: ["Alex (Technician)", "Dana (Customer)"], faces: { "Alex (Technician)": true, "Dana (Customer)": true }, cam: "Static locked-off", dur: 8, action: "Alex turns the tablet to face Dana and points to an item on the screen.", open: "Dana at the counter facing Alex (matches previous end frame); tablet flat on the counter.", close: "Alex has turned the tablet toward Dana and is pointing at the screen; both looking down at it.", cont: "same counter and framing, Dana now standing at the counter" }
+      ]
+    };
+    syncGlobals();
+    save();
+  }
+  // push global state -> the Step-2 DOM controls
+  function syncGlobals() {
+    $("#style").value = state.style || "";
+    $("#neg").value = state.neg || "";
+    if ($("#env")) $("#env").value = (state.env in ENVIRONMENTS) ? state.env : "custom";
+    if ($("#houseRules")) $("#houseRules").checked = !!state.houseRules;
+  }
+
+  // ---- init ----
+  function init() {
+    load();
+    // populate environment options
+    const envSel = $("#env");
+    Object.keys(ENV_LABELS).forEach(k => { const o = el("option"); o.value = k; o.textContent = ENV_LABELS[k]; envSel.appendChild(o); });
+    if (!state.neg) state.neg = $("#neg").value;
+    syncGlobals();
+    $("#addCast").onclick = () => { addCast(); save(); };
+    $("#addShot").onclick = () => { addShot(); save(); };
+    $("#env").onchange = save;
+    $("#houseRules").onchange = save;
+    $("#copyAll").onclick = () => { if (state.shots.length) { copy(fullText()); const b = $("#copyAll"); b.textContent = "Copied ✓"; setTimeout(() => b.textContent = "Copy all", 1400); } };
+    $("#loadSample").onclick = sample;
+    $("#clearAll").onclick = () => { state = { cast: [], style: "", neg: $("#neg").value, shots: [], frameMode: state.frameMode, env: state.env, houseRules: state.houseRules }; syncGlobals(); save(); };
+    $("#frameToggle").onclick = () => { state.frameMode = !state.frameMode; save(); };
+    render();
+
+    // theme toggle
+    const tb = $("#themeBtn");
+    tb.onclick = () => {
+      const cur = document.documentElement.getAttribute("data-theme");
+      const isDark = cur ? cur === "dark" : matchMedia("(prefers-color-scheme: dark)").matches;
+      document.documentElement.setAttribute("data-theme", isDark ? "light" : "dark");
+    };
+  }
+  init();
+})();
+</script>
+</body>
+</html>
