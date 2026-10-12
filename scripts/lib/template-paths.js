@@ -22,6 +22,9 @@ const SYNC_PATHS = [
   'scripts/import-storyboard.js',
   'scripts/import-review.js',         // pull reviewer comments → review/ report
   'scripts/package-scorm.js',
+  'scripts/stamp-build.js',         // package-scorm stamps the build id with it (required)
+  'scripts/build-share.js',         // npm run share: coworker Review + LMS-Test zips
+  'scripts/share/serve.ps1',        // the double-click Windows server inside those zips
   'scripts/sync-output.js',
   'scripts/sync-from-template.js',  // self-update so the next run uses the latest
   'scripts/sync-template.js',       // the module → template push counterpart

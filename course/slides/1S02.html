@@ -1,0 +1,1095 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=1920">
+  <title>Personal Protective Equipment for High-Voltage Work</title>
+  <link rel="stylesheet" href="../assets/css/pds-tokens.css">
+  <link rel="stylesheet" href="../assets/css/slide-base.css">
+  <link rel="stylesheet" href="../assets/css/animations.css">
+  <script>(function(){function s(){document.documentElement.style.setProperty('--scale',Math.min(window.innerWidth/1920,window.innerHeight/920));}s();window.addEventListener('resize',s);})();</script>
+  <style>
+
+    /* ── Full-slide layout ───────────────────────────────────────────────── */
+    .slide {
+      display: flex;
+      flex-direction: column;
+      background: #0A0A0C;
+      overflow: hidden;
+    }
+
+    /* ── Top header bar ──────────────────────────────────────────────────── */
+    .slide-header {
+      flex-shrink: 0;
+      height: 72px;
+      display: flex;
+      align-items: center;
+      padding: 0 80px;
+      gap: 20px;
+      background: #0D0D0F;
+      border-bottom: 1px solid rgba(255,255,255,0.08);
+    }
+    .header-accent-dot {
+      flex-shrink: 0;
+      width: 10px; height: 10px;
+      border-radius: 50%;
+      background: var(--pds-accent);
+    }
+    .header-label {
+      font-size: var(--pds-font-size-xs);
+      font-weight: var(--pds-font-weight-bold);
+      letter-spacing: 0.14em;
+      text-transform: uppercase;
+      color: var(--pds-accent);
+    }
+    .header-divider {
+      width: 1px; height: 20px;
+      background: rgba(255,255,255,0.14);
+    }
+    .header-title {
+      font-size: var(--pds-font-size-md);
+      font-weight: var(--pds-font-weight-semibold);
+      color: var(--pds-text-primary);
+      margin: 0;
+    }
+
+    /* ── Video area ──────────────────────────────────────────────────────── */
+    .video-area {
+      flex: 1;
+      position: relative;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      background: #000;
+    }
+
+    /* Placeholder — replace with real <video> element when files are ready */
+    .video-placeholder {
+      width: 100%;
+      height: 100%;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      gap: 20px;
+      background:
+        repeating-linear-gradient(
+          45deg,
+          rgba(255,255,255,0.015) 0px,
+          rgba(255,255,255,0.015) 1px,
+          transparent 1px,
+          transparent 24px
+        ),
+        #0A0A0C;
+    }
+    .placeholder-icon {
+      width: 80px; height: 80px;
+      border-radius: 50%;
+      border: 2px solid rgba(255,255,255,0.18);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 32px;
+      color: rgba(255,255,255,0.35);
+    }
+    .placeholder-label {
+      font-size: var(--pds-font-size-sm);
+      font-weight: var(--pds-font-weight-bold);
+      letter-spacing: 0.14em;
+      text-transform: uppercase;
+      color: rgba(255,255,255,0.25);
+    }
+    .placeholder-filename {
+      font-size: var(--pds-font-size-xs);
+      color: rgba(255,255,255,0.18);
+      font-family: monospace;
+      letter-spacing: 0.04em;
+    }
+
+    /* TODO: wire up pause points when video is ready.
+       Replace .video-placeholder with:
+       <video id="video-player" src="../assets/video/FILENAME.mp4"
+              playsinline preload="metadata"></video>
+       Add pause-point logic in the script block below. */
+
+    /* ── MC overlay — pause-point question ──────────────────────────────── */
+    .mc-overlay {
+      position: absolute;
+      inset: 0;
+      background: rgba(0,0,0,0.78);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      z-index: 20;
+      opacity: 0;
+      pointer-events: none;
+      transition: opacity 0.35s ease;
+    }
+    .mc-overlay.is-visible {
+      opacity: 1;
+      pointer-events: auto;
+    }
+
+    .mc-card {
+      width: 920px;
+      background: #1e2128;
+      border: 1px solid rgba(255,255,255,0.14);
+      border-radius: 20px;
+      box-shadow: 0 32px 80px rgba(0,0,0,0.65);
+      overflow: hidden;
+      transform: translateY(20px) scale(0.97);
+      transition: transform 0.35s cubic-bezier(0.22, 1, 0.36, 1);
+    }
+    .mc-overlay.is-visible .mc-card { transform: none; }
+
+    .mc-header {
+      background: var(--pds-accent);
+      padding: 18px 32px;
+    }
+    .mc-header__title {
+      margin: 0;
+      font-size: var(--pds-font-size-md);
+      font-weight: var(--pds-font-weight-bold);
+      color: #fff;
+      letter-spacing: 0.01em;
+    }
+
+    .mc-body { padding: 28px 32px 24px; }
+
+    .mc-question {
+      margin: 0 0 22px 0;
+      font-size: var(--pds-font-size-md);
+      line-height: 1.5;
+      color: var(--pds-text-primary);
+    }
+
+    .mc-choices {
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+    }
+
+    .mc-choice {
+      display: flex;
+      align-items: center;
+      gap: 16px;
+      padding: 14px 20px;
+      background: rgba(255,255,255,0.04);
+      border: 1.5px solid rgba(255,255,255,0.10);
+      border-radius: 10px;
+      cursor: pointer;
+      user-select: none;
+      transition: border-color 0.18s, background 0.18s;
+    }
+    .mc-choice:hover:not(.is-locked) {
+      border-color: rgba(255,255,255,0.28);
+      background: rgba(255,255,255,0.07);
+    }
+    .mc-choice.is-selected  { border-color: rgba(255,255,255,0.50); background: rgba(255,255,255,0.08); }
+    .mc-choice.is-correct   { border-color: rgba(9,208,135,0.65);   background: rgba(9,208,135,0.08); }
+    .mc-choice.is-incorrect { border-color: rgba(252,64,64,0.55);   background: rgba(252,64,64,0.07); }
+    .mc-choice.is-locked    { cursor: default; }
+
+    .mc-choice__letter {
+      flex-shrink: 0;
+      width: 36px; height: 36px;
+      border-radius: 50%;
+      border: 1.5px solid rgba(255,255,255,0.18);
+      background: rgba(255,255,255,0.05);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: var(--pds-font-size-sm);
+      font-weight: var(--pds-font-weight-bold);
+      color: var(--pds-text-muted);
+    }
+    .mc-choice.is-correct   .mc-choice__letter { border-color: rgba(9,208,135,0.65);  background: rgba(9,208,135,0.18);  color: var(--pds-success, #09D087); }
+    .mc-choice.is-incorrect .mc-choice__letter { border-color: rgba(252,64,64,0.55); background: rgba(252,64,64,0.16);  color: var(--pds-error, #FC4040); }
+
+    .mc-choice__text {
+      font-size: var(--pds-font-size-sm);
+      font-weight: var(--pds-font-weight-semibold);
+      color: var(--pds-text-secondary);
+      line-height: 1.3;
+    }
+
+    .mc-footer {
+      padding: 0 32px 24px;
+      display: flex;
+      justify-content: flex-end;
+    }
+
+    .mc-submit {
+      padding: 12px 36px;
+      background: var(--pds-accent);
+      border: none;
+      border-radius: 8px;
+      font-family: var(--pds-font-family);
+      font-size: var(--pds-font-size-sm);
+      font-weight: var(--pds-font-weight-bold);
+      color: #fff;
+      cursor: pointer;
+      opacity: 0.32;
+      pointer-events: none;
+      transition: background 0.2s, opacity 0.2s;
+    }
+    .mc-submit.is-ready { opacity: 1; pointer-events: auto; }
+
+    /* Continue reads as the player's Next button: same size, colour and chevron,
+       so "move on" looks the same wherever the learner meets it. */
+    .mc-continue {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 6px;
+      height: 36px;
+      padding: 0 16px;
+      background: #d5001c;
+      border: none;
+      border-radius: 4px;
+      font-family: 'Porsche Next TT', Arial, Helvetica, sans-serif;
+      font-size: 14px;
+      font-weight: 700;
+      color: #fff;
+      cursor: pointer;
+      transition: background 0.2s ease;
+    }
+    .mc-continue:hover { background: #b0001a; }
+    .mc-continue svg { width: 18px; height: 18px; fill: #fff; flex-shrink: 0; }
+    .mc-submit.is-ready:hover { background: #b8001a; }
+
+    /* ── Video controls bar ──────────────────────────────────────────────── */
+    .video-controls {
+      flex-shrink: 0;
+      height: 64px;
+      background: #0D0D0F;
+      border-top: 1px solid rgba(255,255,255,0.08);
+      display: flex;
+      align-items: center;
+      padding: 0 80px;
+      gap: 20px;
+    }
+    .video-play-btn {
+      flex-shrink: 0;
+      width: 40px; height: 40px;
+      border-radius: 50%;
+      border: 1.5px solid rgba(255,255,255,0.20);
+      background: rgba(255,255,255,0.05);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      font-size: 14px;
+      color: var(--pds-text-muted);
+      transition: border-color 0.2s, color 0.2s;
+    }
+    .video-skip-btn {
+      flex-shrink: 0; position: relative;
+      width: 40px; height: 40px; border-radius: 50%;
+      border: 1px solid rgba(255,255,255,0.22); background: transparent;
+      display: flex; align-items: center; justify-content: center; cursor: pointer;
+      color: var(--pds-text-muted); transition: border-color 0.2s, color 0.2s;
+    }
+    .video-skip-btn svg { width: 26px; height: 26px; fill: currentColor; }
+    .video-skip-btn span {
+      position: absolute; top: 50%; left: 50%; transform: translate(-50%, -38%);
+      font-size: 9px; font-weight: 700; line-height: 1;
+    }
+    .video-skip-btn:hover { border-color: var(--pds-accent); color: var(--pds-text-primary); }
+    .video-skip-btn:disabled { opacity: 0.35; cursor: default; border-color: rgba(255,255,255,0.22); }
+    .video-play-btn:hover { border-color: var(--pds-accent); color: var(--pds-text-primary); }
+    .video-progress {
+      flex: 1;
+      height: 4px;
+      background: rgba(255,255,255,0.12);
+      border-radius: 2px;
+      cursor: pointer;
+      position: relative;
+    }
+    .video-progress-fill {
+      height: 100%;
+      width: 0%;
+      background: var(--pds-accent);
+      border-radius: 2px;
+      transition: width 0.1s linear;
+    }
+    .video-time {
+      flex-shrink: 0;
+      font-size: var(--pds-font-size-xs);
+      color: var(--pds-text-muted);
+      letter-spacing: 0.04em;
+      font-variant-numeric: tabular-nums;
+    }
+    .todo-badge {
+      margin-left: auto;
+      padding: 4px 14px;
+      background: rgba(213,0,28,0.15);
+      border: 1px solid rgba(213,0,28,0.35);
+      border-radius: 20px;
+      font-size: 11px;
+      font-weight: var(--pds-font-weight-bold);
+      letter-spacing: 0.08em;
+      color: var(--pds-accent);
+      text-transform: uppercase;
+    }
+
+
+    /* ── Closed captions ─────────────────────────────────────────────────── */
+    /* Keep the player inside the 920px stage: without these the video's
+       intrinsic 1080px height grows the flex area and pushes the controls off. */
+    .video-area   { min-height: 0; overflow: hidden; }
+    .video-player { width: 100%; height: 100%; object-fit: contain; background: #000; }
+    .video-player::cue { background:rgba(0,0,0,0.78); color:#fff; font-size:0.85em; line-height:1.35; }
+    .video-caption { position:fixed; left:50%; bottom:24px; transform:translateX(-50%);
+      max-width:80%; padding:6px 18px; background:rgba(0,0,0,0.82); color:#fff;
+      font-size:26px; line-height:1.35; text-align:center; border-radius:6px;
+      white-space:pre-wrap; z-index:18; display:none; pointer-events:none; }
+
+    /* ── End card — shown when the video ends with every checkpoint done ─── */
+    .end-overlay { background: #0A0A0C; }
+    .end-overlay .mc-header { display: flex; align-items: center; gap: 14px; }
+    .end-check {
+      width: 30px; height: 30px; border-radius: 50%; background: #fff;
+      color: var(--pds-accent); display: flex; align-items: center; justify-content: center;
+      font-size: 18px; font-weight: 700; flex-shrink: 0;
+    }
+    .end-text { margin: 0 0 18px; font-size: var(--pds-font-size-md); line-height: 1.5; color: var(--pds-text-primary); }
+    .end-points { margin: 0 0 20px; padding: 0; list-style: none; display: flex; flex-direction: column; gap: 12px; }
+    .end-points li {
+      position: relative; padding-left: 22px; font-size: var(--pds-font-size-sm);
+      line-height: 1.5; color: var(--pds-text-muted);
+    }
+    .end-points li::before {
+      content: ''; position: absolute; left: 0; top: 0.55em; width: 8px; height: 8px;
+      border-radius: 50%; background: var(--pds-accent);
+    }
+    .end-note { margin: 0; font-size: var(--pds-font-size-sm); color: var(--pds-text-primary); font-weight: var(--pds-font-weight-semibold); }
+    .end-actions { display: flex; justify-content: flex-end; margin-top: 22px; }
+    .end-replay {
+      height: 44px; padding: 0 22px; border-radius: 22px; cursor: pointer;
+      border: 1px solid rgba(255,255,255,0.3); background: transparent;
+      color: var(--pds-text-primary); font: inherit; font-size: var(--pds-font-size-sm);
+    }
+    .end-replay:hover { border-color: var(--pds-accent); }
+
+    /* ── Review tools (local preview / review build only) ─────────────────── */
+    .review-jumps { display: none; flex-shrink: 0; align-items: center; gap: 6px; }
+    .review-on .review-jumps { display: flex; }
+    .review-jumps__label {
+      font-size: 11px; letter-spacing: 0.12em; text-transform: uppercase;
+      color: var(--pds-text-muted); margin-right: 2px;
+    }
+    .review-jump {
+      min-width: 30px; height: 26px; padding: 0 8px; border-radius: 13px;
+      border: 1px solid rgba(255,255,255,0.22); background: transparent;
+      color: var(--pds-text-primary); font: inherit; font-size: 12px; cursor: pointer;
+    }
+    .review-jump:hover { border-color: var(--pds-accent); }
+    .review-on .video-progress { height: 8px; }
+    .review-tick {
+      position: absolute; top: -3px; width: 3px; height: 14px; margin-left: -1px;
+      background: #fff; border-radius: 1px; pointer-events: none;
+    }
+
+    /* ── Start CTA — the "do this now" affordance over a paused video ────── */
+    /* The controls-bar play button alone is too quiet: learners sat on a loaded
+       slide not knowing to start it. This is the big, obvious target. */
+    .video-cta {
+      position: absolute; inset: 0;
+      display: flex; flex-direction: column;
+      align-items: center; justify-content: center; gap: 18px;
+      background: rgba(10,10,12,0.18);
+      cursor: pointer; z-index: 12;
+      transition: opacity 0.25s ease;
+    }
+    .video-cta.is-hidden { opacity: 0; pointer-events: none; }
+    /* Locked while the slide's intro narration is still playing. */
+    .video-cta.is-locked { cursor: default; }
+    .video-cta.is-locked .video-cta__btn { background: rgba(255,255,255,0.14); box-shadow: none; }
+    .video-cta.is-locked:hover .video-cta__btn { background: rgba(255,255,255,0.14); transform: none; }
+    .video-cta__btn {
+      width: 104px; height: 104px;
+      border-radius: 50%;
+      background: rgba(213,0,28,0.92);
+      box-shadow: 0 12px 40px rgba(0,0,0,0.5);
+      display: flex; align-items: center; justify-content: center;
+      transition: transform 0.2s ease, background 0.2s ease;
+    }
+    .video-cta:hover .video-cta__btn,
+    .video-cta:focus-visible .video-cta__btn { background: var(--pds-accent); transform: scale(1.06); }
+    .video-cta__icon { font-size: 40px; line-height: 1; color: #fff; margin-left: 6px; }
+    .video-cta__label {
+      font-size: var(--pds-font-size-sm);
+      font-weight: var(--pds-font-weight-semibold);
+      letter-spacing: 0.02em; color: #fff;
+      text-shadow: 0 2px 12px rgba(0,0,0,0.65);
+    }
+  </style>
+</head>
+<body>
+
+<div class="slide" data-slide-id="1S02" data-template="video-scenario"
+     data-dual="false"
+     data-file-a=""
+     data-file-b=""
+     data-file="../assets/video/ppe_video_HVS02.mp4"
+     data-summary-audio="">
+
+  <!-- Header -->
+  <header class="slide-header">
+    <div class="header-accent-dot"></div>
+    <span class="header-label">Video</span>
+    <div class="header-divider"></div>
+    <h2 class="header-title">Personal Protective Equipment for High-Voltage Work</h2>
+  </header>
+
+  <!-- Video area -->
+  <div class="video-area" id="video-area">
+
+    <!-- Video element (src swapped by JS; placeholder shown when file missing) -->
+    <video id="video-player" class="video-player" preload="metadata" playsinline
+           style="display:none">
+    </video>
+
+    <!-- Placeholder shown when no video file is present yet -->
+    <div class="video-placeholder" id="video-placeholder">
+      <div class="placeholder-icon">&#9654;</div>
+      <div class="placeholder-label">Video Coming Soon</div>
+      <div class="placeholder-filename" id="placeholder-filename"></div>
+    </div>
+
+    <!-- Start CTA — hidden once playback begins (see showCta) -->
+    <div class="video-cta" id="video-cta" role="button" tabindex="0" aria-label="Play video">
+      <span class="video-cta__btn" aria-hidden="true"><span class="video-cta__icon">&#9654;</span></span>
+      <span class="video-cta__label">Select play to begin</span>
+    </div>
+
+    <!-- MC Overlay — shown at each pause point -->
+    <div class="mc-overlay" id="mc-overlay" role="dialog" aria-modal="true" aria-labelledby="mc-title">
+      <div class="mc-card">
+        <div class="mc-header">
+          <h3 class="mc-header__title" id="mc-title">Check Your Understanding</h3>
+          <span class="mc-counter" id="mc-counter"></span>
+        </div>
+        <div class="mc-body">
+          <p class="mc-question" id="mc-question"></p>
+          <div class="mc-choices" id="mc-choices" role="radiogroup" aria-label="Answer options"></div>
+          <div class="mc-feedback" id="mc-feedback" aria-live="polite"></div>
+        </div>
+        <div class="mc-footer">
+          <button class="mc-submit" id="mc-submit" disabled aria-disabled="true">Submit Answer</button>
+          <button class="mc-continue" id="mc-continue" style="display:none"><span id="mc-continue-label">Continue</span><svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg" aria-hidden="true"><path d="m15.121 11.997-5.477-6.497-.769.642 4.94 5.858-4.94 5.858.768.642 5.476-6.494.006-.005v-.001z"/></svg></button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Summary VO overlay — plays after all clips & questions complete -->
+    <div class="mc-overlay end-overlay" id="end-overlay" role="dialog" aria-modal="true" aria-labelledby="end-title">
+      <div class="mc-card">
+        <div class="mc-header">
+          <span class="end-check" aria-hidden="true">&#10003;</span>
+          <h3 class="mc-header__title" id="end-title"></h3>
+        </div>
+        <div class="mc-body">
+          <p class="end-text" id="end-text"></p>
+          <ul class="end-points" id="end-points"></ul>
+          <p class="end-note" id="end-note"></p>
+          <div class="end-actions">
+            <button type="button" class="end-replay" id="end-replay">Watch the video again</button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+  </div>
+
+  <!-- Video controls -->
+  <div class="video-controls" id="video-controls">
+    <button class="video-skip-btn" id="video-back-btn" aria-label="Back 5 seconds" title="Back 5 seconds"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 5V2L7 6l5 4V7a6 6 0 1 1-6 6H4a8 8 0 1 0 8-8z"/></svg><span>5</span></button>
+    <button class="video-play-btn" id="video-play-btn" aria-label="Play / Pause">&#9654;</button>
+    <button class="video-skip-btn" id="video-fwd-btn" aria-label="Forward 5 seconds" title="Forward 5 seconds"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 5V2l5 4-5 4V7a6 6 0 1 0 6 6h2a8 8 0 1 1-8-8z"/></svg><span>5</span></button>
+    <div class="video-progress" id="video-progress" role="progressbar"
+         aria-valuemin="0" aria-valuemax="100" aria-valuenow="0">
+      <div class="video-progress-fill" id="video-progress-fill"></div>
+    </div>
+    <span class="video-time" id="video-time">0:00 / 0:00</span>
+    <div class="review-jumps" id="review-jumps" aria-label="Review: jump to checkpoint">
+      <span class="review-jumps__label">Review</span>
+    </div>
+  </div>
+
+</div>
+
+<!-- Pause question data injected by generate-slides.js -->
+<script>
+var PAUSE_QUESTIONS = [{"n":1,"question":"Using Ohm's law, how much current can 300 volts drive through a body with a hand-to-hand resistance of 1,000 ohms?","at":186,"rewind":149.5,"choices":["3 milliamps","30 milliamps","300 milliamps","3,000 milliamps"],"correct":"C","feedbackCorrect":"Correct. 300 volts divided by 1,000 ohms is 300 milliamps, three times the 100 milliamps considered deadly.","feedbackIncorrect":"Not quite. Let's rewatch the section on how electric current affects the body. Listen for the Ohm's law example.","audioCorrect":"../assets/audio/vo/1S02-PauseQuestion1FeedbackCorrect.mp3","audioIncorrect":"../assets/audio/vo/1S02-PauseQuestion1FeedbackIncorrect.mp3"},{"n":2,"question":"The test date stamped on your rubber insulating gloves is eight months old. What should you do?","at":387.5,"rewind":362,"choices":["Use them if they pass the air-inflation test","Use them with leather protector gloves over them","Use them for low-voltage tasks only","Take them out of service and send them for testing and recertification"],"correct":"D","feedbackCorrect":"Correct. Rubber insulating gloves must be lab-tested and recertified every six months. The air-inflation test is a check before each use, not a replacement for recertification.","feedbackIncorrect":"Not quite. Let's rewatch the section on glove testing. Listen for how often gloves must be recertified.","audioCorrect":"../assets/audio/vo/1S02-PauseQuestion2FeedbackCorrect.mp3","audioIncorrect":"../assets/audio/vo/1S02-PauseQuestion2FeedbackIncorrect.mp3"},{"n":3,"question":"Why does work on Porsche battery electric vehicles (BEVs) require a higher level of arc-flash protection than work on hybrids?","at":586,"rewind":535.5,"choices":["BEVs operate at 800 volts, hybrids at 400 volts","BEVs use AC current, hybrids use DC current","BEV technicians don't wear rubber insulating gloves","Hybrids don't need arc-flash protection"],"correct":"A","feedbackCorrect":"Correct. The energy potential in the system sets the arc rating required. Check the Porsche Special Tools subspace on PPN for the exact PPE kit.","feedbackIncorrect":"Not quite. Let's rewatch the section on arc-rated clothing. Listen for the voltages Porsche BEVs and hybrids operate at.","audioCorrect":"../assets/audio/vo/1S02-PauseQuestion3FeedbackCorrect.mp3","audioIncorrect":"../assets/audio/vo/1S02-PauseQuestion3FeedbackIncorrect.mp3"},{"n":4,"question":"Which designation should you look for on the label of shoes worn for high-voltage work?","at":630,"rewind":593,"choices":["ESD (anti-static)","EH (electrical hazard)","SR (slip resistant)","Any steel-toe rating"],"correct":"B","feedbackCorrect":"Correct. EH-rated shoes insulate the wearer. Don't confuse them with anti-static shoes, which work differently. Hard-toe EH shoes are recommended.","feedbackIncorrect":"Not quite. Let's rewatch the section on shoes. Listen for the designation on the label.","audioCorrect":"../assets/audio/vo/1S02-PauseQuestion4FeedbackCorrect.mp3","audioIncorrect":"../assets/audio/vo/1S02-PauseQuestion4FeedbackIncorrect.mp3"},{"n":5,"question":"Who is responsible for providing high-voltage PPE?","at":702,"rewind":676.5,"choices":["The technician provides all of it","The PPE supplier provides it with each vehicle","The Porsche Center provides it, except shoes, which the technician provides","The Porsche Center provides all of it, including shoes"],"correct":"C","feedbackCorrect":"Correct. The Porsche Center provides PPE. Shoes are the technician's responsibility.","feedbackIncorrect":"Not quite. Let's rewatch the section on purchasing PPE. Listen for who provides each item.","audioCorrect":"../assets/audio/vo/1S02-PauseQuestion5FeedbackCorrect.mp3","audioIncorrect":"../assets/audio/vo/1S02-PauseQuestion5FeedbackIncorrect.mp3"}];
+var END_CARD = {"title":"Module Complete","text":"You've finished Personal Protective Equipment (PPE) and answered all five knowledge checks. Remember:","points":["Rubber insulating gloves are your primary protection against electric shock. Check them before every use, and don't use them if the test date is more than six months old.","Arc-rated clothing, face shield, and balaclava, worn with the gloves, protect you from arc-flash burns.","Use the Porsche Special Tools subspace on PPN to find the right PPE kit for 400-volt and 800-volt work."],"note":"Your completion has been recorded. You can now close this module."};
+</script>
+
+<script src="../assets/vendor/gsap/gsap.min.js"></script>
+<script src="../assets/vendor/slide-pause.js"></script>
+<script>
+(function () {
+
+  /* ── Config from data attributes ──────────────────────────────────────── */
+  var root       = document.querySelector('.slide');
+  var isDual     = root.dataset.dual === 'true';
+  var fileA      = root.dataset.fileA   || '';
+  var fileB      = root.dataset.fileB   || '';
+  var fileSingle = root.dataset.file    || '';
+  var summaryAudioSrc = root.dataset.summaryAudio || '';
+
+  /* Clip list. Prefer the numbered form (Video-File-1..N) which supports any
+     number of clips — e.g. one per pause question. Otherwise fall back to the
+     A/B pair, then to a single file. */
+  var numberedClips = [];
+  var clips = (numberedClips && numberedClips.length)
+    ? numberedClips
+    : (isDual
+        ? [{ src: fileA, label: 'Clip A' }, { src: fileB, label: 'Clip B' }]
+        : [{ src: fileSingle, label: '' }]);
+
+  var currentClip      = 0;
+  var pauseIdx         = 0;   /* index into PAUSE_QUESTIONS */
+  var questionsPerClip = clips.length > 1
+    ? Math.ceil(PAUSE_QUESTIONS.length / clips.length)
+    : PAUSE_QUESTIONS.length;
+
+  /* ── DOM refs ─────────────────────────────────────────────────────────── */
+  var videoEl        = document.getElementById('video-player');
+  var placeholder    = document.getElementById('video-placeholder');
+  var placeholderLbl = document.getElementById('placeholder-filename');
+  var overlay        = document.getElementById('mc-overlay');
+  var questionEl     = document.getElementById('mc-question');
+  var choicesEl      = document.getElementById('mc-choices');
+  var feedbackEl     = document.getElementById('mc-feedback');
+  var submitBtn      = document.getElementById('mc-submit');
+  var continueBtn    = document.getElementById('mc-continue');
+  var counterEl      = document.getElementById('mc-counter');
+  var endOverlay     = document.getElementById('end-overlay');
+  var playBtn        = document.getElementById('video-play-btn');
+  var progFill       = document.getElementById('video-progress-fill');
+  var timeEl         = document.getElementById('video-time');
+  var capEl      = document.getElementById('video-caption');
+  if (!capEl && videoEl && videoEl.parentElement) {
+    capEl = document.createElement('div');
+    capEl.id = 'video-caption'; capEl.className = 'video-caption';
+    videoEl.parentElement.appendChild(capEl);
+  }
+  var captionsOn = false;
+
+  function currentTextTrack() {
+    return (videoEl.textTracks && videoEl.textTracks.length) ? videoEl.textTracks[0] : null;
+  }
+  function renderCaption() {
+    if (!capEl) return;
+    var tt = currentTextTrack();
+    var txt = '';
+    if (captionsOn && tt && tt.activeCues) {
+      for (var i = 0; i < tt.activeCues.length; i++) txt += (i ? '\n' : '') + tt.activeCues[i].text;
+    }
+    capEl.textContent = txt;
+    capEl.style.display = (captionsOn && txt) ? 'block' : 'none';
+  }
+  function attachCaptions(src) {
+    Array.prototype.slice.call(videoEl.querySelectorAll('track')).forEach(function (t) { t.remove(); });
+    if (!src) { if (capEl) capEl.style.display = 'none'; return; }
+    var vtt = src.replace(/\.(mp4|webm|mov)(\?.*)?$/i, '.vtt');
+    var tr = document.createElement('track');
+    tr.kind = 'captions'; tr.srclang = 'en'; tr.label = 'English'; tr.src = vtt;
+    videoEl.appendChild(tr);
+    setTimeout(function () {
+      var tt = currentTextTrack();
+      if (tt) { tt.mode = 'hidden'; tt.oncuechange = renderCaption; }
+      renderCaption();
+    }, 0);
+  }
+  if (window.parent && window.parent !== window) window.parent.postMessage({ type: 'sandbox-request-cc' }, '*');
+
+  /* The player's mute button controls the video and feedback audio too. */
+  var playerMuted = false;
+  window.addEventListener('message', function (e) {
+    if (!e.data || e.data.type !== 'mute-state') return;
+    playerMuted = !!e.data.muted;
+    if (videoEl) videoEl.muted = playerMuted;
+    if (typeof feedbackAudio !== 'undefined' && feedbackAudio) feedbackAudio.muted = playerMuted;
+  });
+  if (window.parent && window.parent !== window) window.parent.postMessage({ type: 'sandbox-request-mute' }, '*');
+  window.addEventListener('message', function (e) {
+    if (e.data && e.data.type === 'cc-state') { captionsOn = !!e.data.on; renderCaption(); }
+  });
+
+  var selected  = null;
+  var submitted = false;
+  var rewatchFrom   = null;   /* seconds to replay from after a wrong answer */
+  var continueLabel = document.getElementById('mc-continue-label');
+  var letters   = ['A', 'B', 'C', 'D'];
+
+  /* ── Feedback audio ───────────────────────────────────────────────────── */
+  var feedbackAudio = new Audio();
+
+  function playFeedbackAudio(src) {
+    if (!src) return;
+    feedbackAudio.muted = playerMuted;
+    feedbackAudio.src = src;
+    feedbackAudio.play().catch(function () {});
+  }
+
+  function stopFeedbackAudio() {
+    try { feedbackAudio.pause(); feedbackAudio.currentTime = 0; } catch (e) {}
+  }
+
+  /* ── Video setup ──────────────────────────────────────────────────────── */
+  function loadClip(idx) {
+    var clip = clips[idx];
+    if (!clip || !clip.src) {
+      /* No file yet — show placeholder */
+      placeholder.style.display = '';
+      videoEl.style.display     = 'none';
+      showCta(false);
+      if (placeholderLbl) {
+        var names = isDual ? [fileA, fileB] : [fileSingle];
+        placeholderLbl.textContent = names.filter(Boolean).join(' / ') || 'Video file not yet available';
+      }
+      return;
+    }
+    videoEl.src           = clip.src;
+    videoEl.style.display = '';
+    placeholder.style.display = 'none';
+    videoEl.load();
+    /* Nudge past 0 once data arrives so the opening frame actually paints. A
+       preload="metadata" video can otherwise sit as an empty black panel, which
+       behind the start CTA looks like the video is missing. */
+    videoEl.addEventListener('loadeddata', function onReady() {
+      videoEl.removeEventListener('loadeddata', onReady);
+      if (videoEl.paused && videoEl.currentTime === 0) {
+        try { videoEl.currentTime = 0.05; } catch (err) {}
+      }
+    });
+    attachCaptions(clip.src);
+  }
+
+  var ctaEl = document.getElementById('video-cta');
+
+  /* The CTA is shown only when the learner actually needs to act: a loaded,
+     paused video with no question on screen. */
+  function showCta(show) {
+    if (ctaEl) ctaEl.classList.toggle('is-hidden', !show);
+  }
+  /* ── Intro-VO gate ────────────────────────────────────────────────────── */
+  /* The video must not start over the slide's narration. Default OPEN so a slide
+     with no intro VO — or an older player that never answers — is still playable;
+     we only lock once the player tells us narration is actually running. */
+  var introDone = true;
+  var autoStartPending = true;   /* start on entry, once, as soon as allowed */
+  var ctaLabelEl = ctaEl ? ctaEl.querySelector('.video-cta__label') : null;
+  var ctaReadyLabel = ctaLabelEl ? ctaLabelEl.textContent : '';
+
+  function setIntroGate(narrating) {
+    introDone = !narrating;
+    if (introDone && autoStartPending && videoEl && videoEl.readyState >= 2) startPlayback();
+    if (!ctaEl) return;
+    ctaEl.classList.toggle('is-locked', narrating);
+    ctaEl.setAttribute('aria-disabled', narrating ? 'true' : 'false');
+    if (ctaLabelEl) ctaLabelEl.textContent = narrating ? 'Listen to the introduction first' : ctaReadyLabel;
+  }
+
+  window.addEventListener('message', function (e) {
+    if (!e.data || e.data.type !== 'player-play-state') return;
+    if (e.data.ended === true) { setIntroGate(false); return; }
+    if (e.data.playing === true) {
+      /* Narration just started — including the learner replaying it from the
+         player's own play button. The two must never talk over each other, so
+         the video yields and the gate closes again until the VO finishes. */
+      setIntroGate(true);
+      try { if (videoEl && !videoEl.paused) videoEl.pause(); } catch (err) {}
+    }
+  });
+  /* Ask only after the listener exists, so the answer can never be missed. */
+  if (window.parent && window.parent !== window) {
+    window.parent.postMessage({ type: 'sandbox-request-narration' }, '*');
+  }
+
+  function startPlayback() {
+    if (!introDone) return;                 /* narration still running */
+    if (videoEl.src) videoEl.play().catch(function () {});
+  }
+
+  if (ctaEl) {
+    ctaEl.addEventListener('click', function () { startPlayback(); });
+    ctaEl.addEventListener('keydown', function (e) {
+      if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); ctaEl.click(); }
+    });
+  }
+
+  loadClip(0);
+  /* Start as soon as the slide opens: the learner's Next click is the gesture.
+     If the browser still blocks autoplay, the start CTA stays up. */
+  /* The narration check can close the gate while the video loads; setIntroGate
+     retries when it reopens. autoStartPending clears on the first real play. */
+  if (videoEl && videoEl.src) {
+    videoEl.addEventListener('canplay', function () {
+      if (autoStartPending) startPlayback();
+    });
+    videoEl.addEventListener('playing', function () { autoStartPending = false; });
+  }
+  if (videoEl) {
+    videoEl.style.cursor = 'pointer';
+    videoEl.addEventListener('click', function () {
+      if (!videoEl.src) return;
+      if (videoEl.paused) startPlayback(); else videoEl.pause();   /* pausing is never gated */
+    });
+  }
+
+  /* ── Playback controls ────────────────────────────────────────────────── */
+  function fmt(s) {
+    var m = Math.floor(s / 60), sec = Math.floor(s % 60);
+    return m + ':' + (sec < 10 ? '0' : '') + sec;
+  }
+
+  if (playBtn) {
+    playBtn.addEventListener('click', function () {
+      if (!videoEl.src) return;
+      if (videoEl.paused) startPlayback(); else videoEl.pause();   /* pausing is never gated */
+    });
+  }
+
+  videoEl.addEventListener('play',  function () { stopFeedbackAudio(); showCta(false); playBtn.innerHTML = '&#9646;&#9646;'; });
+  videoEl.addEventListener('pause', function () {
+    stopFeedbackAudio();
+    showCta(!videoEl.ended && !overlay.classList.contains('is-visible'));
+    playBtn.innerHTML = '&#9654;';
+  });
+
+  videoEl.addEventListener('timeupdate', function () {
+    if (!videoEl.duration) return;
+    var pct = (videoEl.currentTime / videoEl.duration) * 100;
+    if (progFill) progFill.style.width = pct + '%';
+    if (timeEl)   timeEl.textContent   = fmt(videoEl.currentTime) + ' / ' + fmt(videoEl.duration);
+  });
+
+  /* ── Pause-point detection ────────────────────────────────────────────── */
+  /* Timecodes are not yet known — pause points are triggered manually via  */
+  /* postMessage from the runtime when it detects the correct cue time.     */
+  /* Until timecodes are set, press P during playback to test the overlay.  */
+
+  function triggerNextPauseQuestion() {
+    if (pauseIdx >= PAUSE_QUESTIONS.length) {
+      onAllQuestionsComplete();
+      return;
+    }
+    if (videoEl.src) videoEl.pause();
+    showQuestion(PAUSE_QUESTIONS[pauseIdx]);
+  }
+
+  /* ── Clip ended ───────────────────────────────────────────────────────── */
+  /* ── Pause points ─────────────────────────────────────────────────────── */
+  /* A question with a numeric `at` (from Pause-At-N in the storyboard) pauses the
+     clip at that second, so "which technique did Alex just use?" is asked at the
+     moment it happened. Questions without `at` keep the original behaviour of
+     firing when the clip ends. */
+  var firedAt = {};
+
+  function pendingQuestion() { return PAUSE_QUESTIONS[pauseIdx]; }
+  function hasTimecode(q) { return !!q && isFinite(q.at) && q.at > 0; }
+
+  videoEl.addEventListener('timeupdate', function () {
+    if (overlay.classList.contains('is-visible')) return;   /* a question is up */
+    var q = pendingQuestion();
+    if (!hasTimecode(q) || firedAt[q.n]) return;
+    if (videoEl.currentTime + 0.05 < q.at) return;
+    firedAt[q.n] = true;
+    triggerNextPauseQuestion();
+  });
+
+  videoEl.addEventListener('ended', function () {
+    var q = pendingQuestion();
+    /* No timecode → legacy: ask at the end of the clip. */
+    if (q && !hasTimecode(q)) { triggerNextPauseQuestion(); return; }
+    /* Timecode sat past the clip's duration → still ask, don't lose the question. */
+    if (hasTimecode(q) && !firedAt[q.n]) { firedAt[q.n] = true; triggerNextPauseQuestion(); return; }
+    /* Every question for this clip is answered. */
+    if (currentClip + 1 < clips.length) {
+      currentClip += 1;
+      loadClip(currentClip);
+      videoEl.play().catch(function () {});
+      return;
+    }
+    onAllQuestionsComplete();
+  });
+
+  /* ── Review tools ─────────────────────────────────────────────────────── */
+  /* Reviewers need to reach each checkpoint without sitting through the whole
+     video. On a local preview, a review build (npm run package:review) or
+     ?review=1, the timeline becomes clickable and jump buttons land a few
+     seconds before each pause point. Learners in the LMS get none of this. */
+  var reviewTools = (function () {
+    try {
+      var w = window.parent;
+      if (w.__REVIEW_BUILD__ === true || /[?&]review=(1|true)\b/.test(w.location.search)) return true;
+      /* The dev tree (dashboard preview) has no build stamp at all. A packaged
+         delivery build is stamped false, so it stays locked even on localhost
+         (e.g. a coworker's LMS-Test copy). */
+      return w.__REVIEW_BUILD__ === undefined &&
+             /^(localhost|127\.0\.0\.1|\[::1\])$/.test(location.hostname);
+    } catch (e) { return false; }
+  }());
+
+  function reviewSeek(t) {
+    if (!videoEl.src) return;
+    t = Math.max(0, Math.min(t, (videoEl.duration || t) - 0.5));
+    stopFeedbackAudio();
+    overlay.classList.remove('is-visible');
+    if (endOverlay) endOverlay.classList.remove('is-visible');
+    videoEl.style.visibility = '';
+    /* Re-arm every checkpoint after the new position; skip the ones before it. */
+    pauseIdx = 0;
+    while (pauseIdx < PAUSE_QUESTIONS.length && hasTimecode(PAUSE_QUESTIONS[pauseIdx]) &&
+           PAUSE_QUESTIONS[pauseIdx].at <= t) pauseIdx++;
+    firedAt = {};
+    for (var i = 0; i < pauseIdx; i++) firedAt[PAUSE_QUESTIONS[i].n] = true;
+    videoEl.currentTime = t;
+    if (introDone) videoEl.play().catch(function () {});
+  }
+
+  if (reviewTools) {
+    document.body.classList.add('review-on');
+    var jumps = document.getElementById('review-jumps');
+    var progEl = document.getElementById('video-progress');
+    PAUSE_QUESTIONS.forEach(function (q, i) {
+      if (!hasTimecode(q)) return;
+      var b = document.createElement('button');
+      b.type = 'button'; b.className = 'review-jump';
+      b.textContent = String(i + 1);
+      b.title = 'Checkpoint ' + (i + 1) + ' (pauses at ' + fmt(q.at) + ')';
+      b.addEventListener('click', function () { reviewSeek(q.at - 5); });
+      jumps.appendChild(b);
+    });
+    var endBtn = document.createElement('button');
+    endBtn.type = 'button'; endBtn.className = 'review-jump'; endBtn.textContent = 'End';
+    endBtn.title = 'Last 5 seconds (tests completion)';
+    endBtn.addEventListener('click', function () { reviewSeek((videoEl.duration || 0) - 5); });
+    jumps.appendChild(endBtn);
+
+    if (progEl) {
+      progEl.addEventListener('click', function (e) {
+        if (!videoEl.duration) return;
+        var r = progEl.getBoundingClientRect();
+        reviewSeek(((e.clientX - r.left) / r.width) * videoEl.duration);
+      });
+      videoEl.addEventListener('loadedmetadata', function () {
+        PAUSE_QUESTIONS.forEach(function (q) {
+          if (!hasTimecode(q) || q.at > videoEl.duration) return;
+          var tick = document.createElement('span');
+          tick.className = 'review-tick';
+          tick.style.left = (q.at / videoEl.duration * 100) + '%';
+          progEl.appendChild(tick);
+        });
+      });
+    }
+  }
+
+  /* ── 5-second skip ────────────────────────────────────────────────────── */
+  /* Back works anywhere. Forward stops at the furthest point already watched,
+     so it can't carry a learner past a checkpoint (no limit in review mode). */
+  var furthest = 0;
+  var backBtn = document.getElementById('video-back-btn');
+  var fwdBtn  = document.getElementById('video-fwd-btn');
+  function fwdLimit() { return reviewTools ? (videoEl.duration || 0) : furthest; }
+  function syncSkipButtons() {
+    if (backBtn) backBtn.disabled = !videoEl.src || videoEl.currentTime < 0.5;
+    if (fwdBtn)  fwdBtn.disabled  = !videoEl.src || videoEl.currentTime >= fwdLimit() - 0.5;
+  }
+  videoEl.addEventListener('timeupdate', function () {
+    if (!videoEl.seeking && videoEl.currentTime > furthest) furthest = videoEl.currentTime;
+    syncSkipButtons();
+  });
+  function skipBy(delta) {
+    if (!videoEl.src || overlay.classList.contains('is-visible')) return;   /* answer first */
+    var t = videoEl.currentTime + delta;
+    t = Math.max(0, Math.min(t, fwdLimit()));
+    if (reviewTools && delta > 0) { reviewSeek(t); return; }   /* re-arms checkpoints */
+    videoEl.currentTime = t;
+    syncSkipButtons();
+  }
+  if (backBtn) backBtn.addEventListener('click', function () { skipBy(-5); });
+  if (fwdBtn)  fwdBtn.addEventListener('click',  function () { skipBy(5); });
+  syncSkipButtons();
+
+  /* ── Show MC question ─────────────────────────────────────────────────── */
+  function showQuestion(data) {
+    selected  = null;
+    submitted = false;
+
+    questionEl.textContent  = data.question || '';
+    feedbackEl.textContent  = '';
+    feedbackEl.className    = 'mc-feedback';
+    choicesEl.innerHTML     = '';
+    submitBtn.disabled      = true;
+    submitBtn.style.display = '';
+    continueBtn.style.display = 'none';
+    submitBtn.classList.remove('is-ready');
+
+    if (counterEl) {
+      counterEl.textContent = 'Question ' + (pauseIdx + 1) + ' of ' + PAUSE_QUESTIONS.length;
+    }
+
+    data.choices.forEach(function (text, i) {
+      if (!text) return;
+      var row = document.createElement('div');
+      row.className = 'mc-choice';
+      row.setAttribute('role', 'radio');
+      row.setAttribute('aria-checked', 'false');
+      row.setAttribute('tabindex', '0');
+      row.dataset.value   = letters[i];
+      row.dataset.correct = (String(data.correct).toUpperCase() === letters[i]) ? 'true' : 'false';
+
+      var ls = document.createElement('span');
+      ls.className   = 'mc-choice__letter';
+      ls.textContent = letters[i];
+
+      var ts = document.createElement('span');
+      ts.className   = 'mc-choice__text';
+      ts.textContent = text;
+
+      row.appendChild(ls);
+      row.appendChild(ts);
+      choicesEl.appendChild(row);
+
+      row.addEventListener('click',   function () { selectChoice(row); });
+      row.addEventListener('keydown', function (e) {
+        if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); selectChoice(row); }
+      });
+    });
+
+    showCta(false);
+    overlay.classList.add('is-visible');
+  }
+
+  function selectChoice(row) {
+    if (submitted) return;
+    Array.from(choicesEl.querySelectorAll('.mc-choice')).forEach(function (r) {
+      r.classList.remove('is-selected');
+      r.setAttribute('aria-checked', 'false');
+    });
+    row.classList.add('is-selected');
+    row.setAttribute('aria-checked', 'true');
+    selected = row;
+    submitBtn.disabled = false;
+    submitBtn.classList.add('is-ready');
+  }
+
+  submitBtn.addEventListener('click', function () {
+    if (!selected || submitted) return;
+    submitted = true;
+
+    var isCorrect  = selected.dataset.correct === 'true';
+    var data       = PAUSE_QUESTIONS[pauseIdx];
+    var feedbackTxt = isCorrect
+      ? (data.feedbackCorrect   || 'Correct!')
+      : (data.feedbackIncorrect || 'Not quite.');
+
+    Array.from(choicesEl.querySelectorAll('.mc-choice')).forEach(function (r) {
+      r.classList.add('is-locked');
+      r.setAttribute('tabindex', '-1');
+      if (r === selected) r.classList.add(isCorrect ? 'is-correct' : 'is-incorrect');
+    });
+
+    feedbackEl.textContent = feedbackTxt;
+    feedbackEl.classList.add(isCorrect ? 'is-correct' : 'is-incorrect');
+
+    playFeedbackAudio(isCorrect ? data.audioCorrect : data.audioIncorrect);
+
+    /* Wrong answer on a question with a rewind point → replay that section. */
+    rewatchFrom = (!isCorrect && isFinite(data.rewind) && data.rewind >= 0 && videoEl.src) ? data.rewind : null;
+    if (continueLabel) continueLabel.textContent = rewatchFrom !== null ? 'Rewatch this section' : 'Continue';
+
+    submitBtn.style.display   = 'none';
+    continueBtn.style.display = '';
+  });
+
+  continueBtn.addEventListener('click', function () {
+    stopFeedbackAudio();
+    overlay.classList.remove('is-visible');
+    if (rewatchFrom !== null) {
+      /* Same question stays pending; it fires again at its pause point. */
+      var pending = PAUSE_QUESTIONS[pauseIdx];
+      if (pending) delete firedAt[pending.n];
+      videoEl.currentTime = rewatchFrom;
+      rewatchFrom = null;
+      videoEl.play().catch(function () {});
+      return;
+    }
+    pauseIdx++;
+
+    /* Mid-clip (a timecoded pause) → just resume; the clip's own 'ended' event
+       decides what happens next. */
+    var nearEnd = videoEl.ended ||
+      (videoEl.duration && videoEl.currentTime >= videoEl.duration - 0.25);
+
+    if (!nearEnd && videoEl.src) {
+      videoEl.play().catch(function () {});
+    } else if (currentClip + 1 < clips.length && pauseIdx >= questionsPerClip * (currentClip + 1)) {
+      /* This clip's questions are answered — roll on to the next clip */
+      currentClip += 1;
+      loadClip(currentClip);
+      videoEl.play().catch(function () {});
+    } else if (pauseIdx < PAUSE_QUESTIONS.length) {
+      /* More questions — but resume video first */
+      if (videoEl.src) videoEl.play().catch(function () {});
+    } else {
+      onAllQuestionsComplete();
+    }
+  });
+
+  /* ── All done — show summary VO ───────────────────────────────────────── */
+  function showEndCard() {
+    if (!endOverlay || !END_CARD || !END_CARD.title) return;
+    document.getElementById('end-title').textContent = END_CARD.title;
+    document.getElementById('end-text').textContent  = END_CARD.text || '';
+    var ul = document.getElementById('end-points');
+    ul.innerHTML = '';
+    (END_CARD.points || []).forEach(function (t) {
+      var li = document.createElement('li'); li.textContent = t; ul.appendChild(li);
+    });
+    document.getElementById('end-note').textContent = END_CARD.note || '';
+    showCta(false);
+    videoEl.style.visibility = 'hidden';   /* the last frame is white; don't let it bleed at the edges */
+    endOverlay.classList.add('is-visible');
+  }
+  var replayBtn = document.getElementById('end-replay');
+  if (replayBtn) replayBtn.addEventListener('click', function () {
+    endOverlay.classList.remove('is-visible');
+    videoEl.style.visibility = '';
+    videoEl.currentTime = 0;
+    videoEl.play().catch(function () {});
+  });
+
+  function onAllQuestionsComplete() {
+    overlay.classList.remove('is-visible');
+    if (videoEl.ended || (videoEl.duration && videoEl.currentTime >= videoEl.duration - 0.5)) showEndCard();
+    if (summaryAudioSrc) {
+      window.parent.postMessage({
+        type: 'sandbox-play-interaction',
+        src:  summaryAudioSrc.replace('../', ''),
+        id:   'video-summary',
+        pauseNarration: false,
+      }, '*');
+    }
+    window.parent.postMessage({ type: 'sandbox-unlock-next' }, '*');
+  }
+
+  /* ── Dev helpers ──────────────────────────────────────────────────────── */
+  document.addEventListener('keydown', function (e) {
+    /* P — trigger next pause question. Review only: in the LMS it would let a
+       learner skip the video and unlock completion. */
+    if (reviewTools && (e.key === 'p' || e.key === 'P') && PAUSE_QUESTIONS.length) {
+      triggerNextPauseQuestion();
+    }
+  });
+
+}());
+</script>
+
+</body>
+</html>

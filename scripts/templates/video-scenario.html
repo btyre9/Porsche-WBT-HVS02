@@ -283,6 +283,20 @@
       color: var(--pds-text-muted);
       transition: border-color 0.2s, color 0.2s;
     }
+    .video-skip-btn {
+      flex-shrink: 0; position: relative;
+      width: 40px; height: 40px; border-radius: 50%;
+      border: 1px solid rgba(255,255,255,0.22); background: transparent;
+      display: flex; align-items: center; justify-content: center; cursor: pointer;
+      color: var(--pds-text-muted); transition: border-color 0.2s, color 0.2s;
+    }
+    .video-skip-btn svg { width: 26px; height: 26px; fill: currentColor; }
+    .video-skip-btn span {
+      position: absolute; top: 50%; left: 50%; transform: translate(-50%, -38%);
+      font-size: 9px; font-weight: 700; line-height: 1;
+    }
+    .video-skip-btn:hover { border-color: var(--pds-accent); color: var(--pds-text-primary); }
+    .video-skip-btn:disabled { opacity: 0.35; cursor: default; border-color: rgba(255,255,255,0.22); }
     .video-play-btn:hover { border-color: var(--pds-accent); color: var(--pds-text-primary); }
     .video-progress {
       flex: 1;
@@ -321,11 +335,61 @@
 
 
     /* ── Closed captions ─────────────────────────────────────────────────── */
+    /* Keep the player inside the 920px stage: without these the video's
+       intrinsic 1080px height grows the flex area and pushes the controls off. */
+    .video-area   { min-height: 0; overflow: hidden; }
+    .video-player { width: 100%; height: 100%; object-fit: contain; background: #000; }
     .video-player::cue { background:rgba(0,0,0,0.78); color:#fff; font-size:0.85em; line-height:1.35; }
     .video-caption { position:fixed; left:50%; bottom:24px; transform:translateX(-50%);
       max-width:80%; padding:6px 18px; background:rgba(0,0,0,0.82); color:#fff;
       font-size:26px; line-height:1.35; text-align:center; border-radius:6px;
       white-space:pre-wrap; z-index:18; display:none; pointer-events:none; }
+
+    /* ── End card — shown when the video ends with every checkpoint done ─── */
+    .end-overlay { background: #0A0A0C; }
+    .end-overlay .mc-header { display: flex; align-items: center; gap: 14px; }
+    .end-check {
+      width: 30px; height: 30px; border-radius: 50%; background: #fff;
+      color: var(--pds-accent); display: flex; align-items: center; justify-content: center;
+      font-size: 18px; font-weight: 700; flex-shrink: 0;
+    }
+    .end-text { margin: 0 0 18px; font-size: var(--pds-font-size-md); line-height: 1.5; color: var(--pds-text-primary); }
+    .end-points { margin: 0 0 20px; padding: 0; list-style: none; display: flex; flex-direction: column; gap: 12px; }
+    .end-points li {
+      position: relative; padding-left: 22px; font-size: var(--pds-font-size-sm);
+      line-height: 1.5; color: var(--pds-text-muted);
+    }
+    .end-points li::before {
+      content: ''; position: absolute; left: 0; top: 0.55em; width: 8px; height: 8px;
+      border-radius: 50%; background: var(--pds-accent);
+    }
+    .end-note { margin: 0; font-size: var(--pds-font-size-sm); color: var(--pds-text-primary); font-weight: var(--pds-font-weight-semibold); }
+    .end-actions { display: flex; justify-content: flex-end; margin-top: 22px; }
+    .end-replay {
+      height: 44px; padding: 0 22px; border-radius: 22px; cursor: pointer;
+      border: 1px solid rgba(255,255,255,0.3); background: transparent;
+      color: var(--pds-text-primary); font: inherit; font-size: var(--pds-font-size-sm);
+    }
+    .end-replay:hover { border-color: var(--pds-accent); }
+
+    /* ── Review tools (local preview / review build only) ─────────────────── */
+    .review-jumps { display: none; flex-shrink: 0; align-items: center; gap: 6px; }
+    .review-on .review-jumps { display: flex; }
+    .review-jumps__label {
+      font-size: 11px; letter-spacing: 0.12em; text-transform: uppercase;
+      color: var(--pds-text-muted); margin-right: 2px;
+    }
+    .review-jump {
+      min-width: 30px; height: 26px; padding: 0 8px; border-radius: 13px;
+      border: 1px solid rgba(255,255,255,0.22); background: transparent;
+      color: var(--pds-text-primary); font: inherit; font-size: 12px; cursor: pointer;
+    }
+    .review-jump:hover { border-color: var(--pds-accent); }
+    .review-on .video-progress { height: 8px; }
+    .review-tick {
+      position: absolute; top: -3px; width: 3px; height: 14px; margin-left: -1px;
+      background: #fff; border-radius: 1px; pointer-events: none;
+    }
 
     /* ── Start CTA — the "do this now" affordance over a paused video ────── */
     /* The controls-bar play button alone is too quiet: learners sat on a loaded
@@ -374,7 +438,7 @@
   <!-- Header -->
   <header class="slide-header">
     <div class="header-accent-dot"></div>
-    <span class="header-label">Video Scenario</span>
+    <span class="header-label">Video</span>
     <div class="header-divider"></div>
     <h2 class="header-title">{{SLIDE_TITLE}}</h2>
   </header>
@@ -414,16 +478,26 @@
         </div>
         <div class="mc-footer">
           <button class="mc-submit" id="mc-submit" disabled aria-disabled="true">Submit Answer</button>
-          <button class="mc-continue" id="mc-continue" style="display:none"><span>Continue</span><svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg" aria-hidden="true"><path d="m15.121 11.997-5.477-6.497-.769.642 4.94 5.858-4.94 5.858.768.642 5.476-6.494.006-.005v-.001z"/></svg></button>
+          <button class="mc-continue" id="mc-continue" style="display:none"><span id="mc-continue-label">Continue</span><svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg" aria-hidden="true"><path d="m15.121 11.997-5.477-6.497-.769.642 4.94 5.858-4.94 5.858.768.642 5.476-6.494.006-.005v-.001z"/></svg></button>
         </div>
       </div>
     </div>
 
     <!-- Summary VO overlay — plays after all clips & questions complete -->
-    <div class="summary-overlay" id="summary-overlay" style="display:none">
-      <div class="summary-card" id="summary-card">
-        <div class="summary-icon" aria-hidden="true">&#10003;</div>
-        <p class="summary-text" id="summary-text"></p>
+    <div class="mc-overlay end-overlay" id="end-overlay" role="dialog" aria-modal="true" aria-labelledby="end-title">
+      <div class="mc-card">
+        <div class="mc-header">
+          <span class="end-check" aria-hidden="true">&#10003;</span>
+          <h3 class="mc-header__title" id="end-title"></h3>
+        </div>
+        <div class="mc-body">
+          <p class="end-text" id="end-text"></p>
+          <ul class="end-points" id="end-points"></ul>
+          <p class="end-note" id="end-note"></p>
+          <div class="end-actions">
+            <button type="button" class="end-replay" id="end-replay">Watch the video again</button>
+          </div>
+        </div>
       </div>
     </div>
 
@@ -431,12 +505,17 @@
 
   <!-- Video controls -->
   <div class="video-controls" id="video-controls">
+    <button class="video-skip-btn" id="video-back-btn" aria-label="Back 5 seconds" title="Back 5 seconds"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 5V2L7 6l5 4V7a6 6 0 1 1-6 6H4a8 8 0 1 0 8-8z"/></svg><span>5</span></button>
     <button class="video-play-btn" id="video-play-btn" aria-label="Play / Pause">&#9654;</button>
+    <button class="video-skip-btn" id="video-fwd-btn" aria-label="Forward 5 seconds" title="Forward 5 seconds"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 5V2l5 4-5 4V7a6 6 0 1 0 6 6h2a8 8 0 1 1-8-8z"/></svg><span>5</span></button>
     <div class="video-progress" id="video-progress" role="progressbar"
          aria-valuemin="0" aria-valuemax="100" aria-valuenow="0">
       <div class="video-progress-fill" id="video-progress-fill"></div>
     </div>
     <span class="video-time" id="video-time">0:00 / 0:00</span>
+    <div class="review-jumps" id="review-jumps" aria-label="Review: jump to checkpoint">
+      <span class="review-jumps__label">Review</span>
+    </div>
   </div>
 
 </div>
@@ -444,6 +523,7 @@
 <!-- Pause question data injected by generate-slides.js -->
 <script>
 var PAUSE_QUESTIONS = {{PAUSE_QUESTIONS_JSON}};
+var END_CARD = {{END_CARD_JSON}};
 </script>
 
 <script src="../assets/vendor/gsap/gsap.min.js"></script>
@@ -486,7 +566,7 @@ var PAUSE_QUESTIONS = {{PAUSE_QUESTIONS_JSON}};
   var submitBtn      = document.getElementById('mc-submit');
   var continueBtn    = document.getElementById('mc-continue');
   var counterEl      = document.getElementById('mc-counter');
-  var summaryOverlay = document.getElementById('summary-overlay');
+  var endOverlay     = document.getElementById('end-overlay');
   var playBtn        = document.getElementById('video-play-btn');
   var progFill       = document.getElementById('video-progress-fill');
   var timeEl         = document.getElementById('video-time');
@@ -525,12 +605,24 @@ var PAUSE_QUESTIONS = {{PAUSE_QUESTIONS_JSON}};
     }, 0);
   }
   if (window.parent && window.parent !== window) window.parent.postMessage({ type: 'sandbox-request-cc' }, '*');
+
+  /* The player's mute button controls the video and feedback audio too. */
+  var playerMuted = false;
+  window.addEventListener('message', function (e) {
+    if (!e.data || e.data.type !== 'mute-state') return;
+    playerMuted = !!e.data.muted;
+    if (videoEl) videoEl.muted = playerMuted;
+    if (typeof feedbackAudio !== 'undefined' && feedbackAudio) feedbackAudio.muted = playerMuted;
+  });
+  if (window.parent && window.parent !== window) window.parent.postMessage({ type: 'sandbox-request-mute' }, '*');
   window.addEventListener('message', function (e) {
     if (e.data && e.data.type === 'cc-state') { captionsOn = !!e.data.on; renderCaption(); }
   });
 
   var selected  = null;
   var submitted = false;
+  var rewatchFrom   = null;   /* seconds to replay from after a wrong answer */
+  var continueLabel = document.getElementById('mc-continue-label');
   var letters   = ['A', 'B', 'C', 'D'];
 
   /* ── Feedback audio ───────────────────────────────────────────────────── */
@@ -538,6 +630,7 @@ var PAUSE_QUESTIONS = {{PAUSE_QUESTIONS_JSON}};
 
   function playFeedbackAudio(src) {
     if (!src) return;
+    feedbackAudio.muted = playerMuted;
     feedbackAudio.src = src;
     feedbackAudio.play().catch(function () {});
   }
@@ -588,11 +681,13 @@ var PAUSE_QUESTIONS = {{PAUSE_QUESTIONS_JSON}};
      with no intro VO — or an older player that never answers — is still playable;
      we only lock once the player tells us narration is actually running. */
   var introDone = true;
+  var autoStartPending = true;   /* start on entry, once, as soon as allowed */
   var ctaLabelEl = ctaEl ? ctaEl.querySelector('.video-cta__label') : null;
   var ctaReadyLabel = ctaLabelEl ? ctaLabelEl.textContent : '';
 
   function setIntroGate(narrating) {
     introDone = !narrating;
+    if (introDone && autoStartPending && videoEl && videoEl.readyState >= 2) startPlayback();
     if (!ctaEl) return;
     ctaEl.classList.toggle('is-locked', narrating);
     ctaEl.setAttribute('aria-disabled', narrating ? 'true' : 'false');
@@ -628,6 +723,16 @@ var PAUSE_QUESTIONS = {{PAUSE_QUESTIONS_JSON}};
   }
 
   loadClip(0);
+  /* Start as soon as the slide opens: the learner's Next click is the gesture.
+     If the browser still blocks autoplay, the start CTA stays up. */
+  /* The narration check can close the gate while the video loads; setIntroGate
+     retries when it reopens. autoStartPending clears on the first real play. */
+  if (videoEl && videoEl.src) {
+    videoEl.addEventListener('canplay', function () {
+      if (autoStartPending) startPlayback();
+    });
+    videoEl.addEventListener('playing', function () { autoStartPending = false; });
+  }
   if (videoEl) {
     videoEl.style.cursor = 'pointer';
     videoEl.addEventListener('click', function () {
@@ -713,6 +818,104 @@ var PAUSE_QUESTIONS = {{PAUSE_QUESTIONS_JSON}};
     onAllQuestionsComplete();
   });
 
+  /* ── Review tools ─────────────────────────────────────────────────────── */
+  /* Reviewers need to reach each checkpoint without sitting through the whole
+     video. On a local preview, a review build (npm run package:review) or
+     ?review=1, the timeline becomes clickable and jump buttons land a few
+     seconds before each pause point. Learners in the LMS get none of this. */
+  var reviewTools = (function () {
+    try {
+      var w = window.parent;
+      if (w.__REVIEW_BUILD__ === true || /[?&]review=(1|true)\b/.test(w.location.search)) return true;
+      /* The dev tree (dashboard preview) has no build stamp at all. A packaged
+         delivery build is stamped false, so it stays locked even on localhost
+         (e.g. a coworker's LMS-Test copy). */
+      return w.__REVIEW_BUILD__ === undefined &&
+             /^(localhost|127\.0\.0\.1|\[::1\])$/.test(location.hostname);
+    } catch (e) { return false; }
+  }());
+
+  function reviewSeek(t) {
+    if (!videoEl.src) return;
+    t = Math.max(0, Math.min(t, (videoEl.duration || t) - 0.5));
+    stopFeedbackAudio();
+    overlay.classList.remove('is-visible');
+    if (endOverlay) endOverlay.classList.remove('is-visible');
+    videoEl.style.visibility = '';
+    /* Re-arm every checkpoint after the new position; skip the ones before it. */
+    pauseIdx = 0;
+    while (pauseIdx < PAUSE_QUESTIONS.length && hasTimecode(PAUSE_QUESTIONS[pauseIdx]) &&
+           PAUSE_QUESTIONS[pauseIdx].at <= t) pauseIdx++;
+    firedAt = {};
+    for (var i = 0; i < pauseIdx; i++) firedAt[PAUSE_QUESTIONS[i].n] = true;
+    videoEl.currentTime = t;
+    if (introDone) videoEl.play().catch(function () {});
+  }
+
+  if (reviewTools) {
+    document.body.classList.add('review-on');
+    var jumps = document.getElementById('review-jumps');
+    var progEl = document.getElementById('video-progress');
+    PAUSE_QUESTIONS.forEach(function (q, i) {
+      if (!hasTimecode(q)) return;
+      var b = document.createElement('button');
+      b.type = 'button'; b.className = 'review-jump';
+      b.textContent = String(i + 1);
+      b.title = 'Checkpoint ' + (i + 1) + ' (pauses at ' + fmt(q.at) + ')';
+      b.addEventListener('click', function () { reviewSeek(q.at - 5); });
+      jumps.appendChild(b);
+    });
+    var endBtn = document.createElement('button');
+    endBtn.type = 'button'; endBtn.className = 'review-jump'; endBtn.textContent = 'End';
+    endBtn.title = 'Last 5 seconds (tests completion)';
+    endBtn.addEventListener('click', function () { reviewSeek((videoEl.duration || 0) - 5); });
+    jumps.appendChild(endBtn);
+
+    if (progEl) {
+      progEl.addEventListener('click', function (e) {
+        if (!videoEl.duration) return;
+        var r = progEl.getBoundingClientRect();
+        reviewSeek(((e.clientX - r.left) / r.width) * videoEl.duration);
+      });
+      videoEl.addEventListener('loadedmetadata', function () {
+        PAUSE_QUESTIONS.forEach(function (q) {
+          if (!hasTimecode(q) || q.at > videoEl.duration) return;
+          var tick = document.createElement('span');
+          tick.className = 'review-tick';
+          tick.style.left = (q.at / videoEl.duration * 100) + '%';
+          progEl.appendChild(tick);
+        });
+      });
+    }
+  }
+
+  /* ── 5-second skip ────────────────────────────────────────────────────── */
+  /* Back works anywhere. Forward stops at the furthest point already watched,
+     so it can't carry a learner past a checkpoint (no limit in review mode). */
+  var furthest = 0;
+  var backBtn = document.getElementById('video-back-btn');
+  var fwdBtn  = document.getElementById('video-fwd-btn');
+  function fwdLimit() { return reviewTools ? (videoEl.duration || 0) : furthest; }
+  function syncSkipButtons() {
+    if (backBtn) backBtn.disabled = !videoEl.src || videoEl.currentTime < 0.5;
+    if (fwdBtn)  fwdBtn.disabled  = !videoEl.src || videoEl.currentTime >= fwdLimit() - 0.5;
+  }
+  videoEl.addEventListener('timeupdate', function () {
+    if (!videoEl.seeking && videoEl.currentTime > furthest) furthest = videoEl.currentTime;
+    syncSkipButtons();
+  });
+  function skipBy(delta) {
+    if (!videoEl.src || overlay.classList.contains('is-visible')) return;   /* answer first */
+    var t = videoEl.currentTime + delta;
+    t = Math.max(0, Math.min(t, fwdLimit()));
+    if (reviewTools && delta > 0) { reviewSeek(t); return; }   /* re-arms checkpoints */
+    videoEl.currentTime = t;
+    syncSkipButtons();
+  }
+  if (backBtn) backBtn.addEventListener('click', function () { skipBy(-5); });
+  if (fwdBtn)  fwdBtn.addEventListener('click',  function () { skipBy(5); });
+  syncSkipButtons();
+
   /* ── Show MC question ─────────────────────────────────────────────────── */
   function showQuestion(data) {
     selected  = null;
@@ -797,6 +1000,10 @@ var PAUSE_QUESTIONS = {{PAUSE_QUESTIONS_JSON}};
 
     playFeedbackAudio(isCorrect ? data.audioCorrect : data.audioIncorrect);
 
+    /* Wrong answer on a question with a rewind point → replay that section. */
+    rewatchFrom = (!isCorrect && isFinite(data.rewind) && data.rewind >= 0 && videoEl.src) ? data.rewind : null;
+    if (continueLabel) continueLabel.textContent = rewatchFrom !== null ? 'Rewatch this section' : 'Continue';
+
     submitBtn.style.display   = 'none';
     continueBtn.style.display = '';
   });
@@ -804,6 +1011,15 @@ var PAUSE_QUESTIONS = {{PAUSE_QUESTIONS_JSON}};
   continueBtn.addEventListener('click', function () {
     stopFeedbackAudio();
     overlay.classList.remove('is-visible');
+    if (rewatchFrom !== null) {
+      /* Same question stays pending; it fires again at its pause point. */
+      var pending = PAUSE_QUESTIONS[pauseIdx];
+      if (pending) delete firedAt[pending.n];
+      videoEl.currentTime = rewatchFrom;
+      rewatchFrom = null;
+      videoEl.play().catch(function () {});
+      return;
+    }
     pauseIdx++;
 
     /* Mid-clip (a timecoded pause) → just resume; the clip's own 'ended' event
@@ -827,8 +1043,31 @@ var PAUSE_QUESTIONS = {{PAUSE_QUESTIONS_JSON}};
   });
 
   /* ── All done — show summary VO ───────────────────────────────────────── */
+  function showEndCard() {
+    if (!endOverlay || !END_CARD || !END_CARD.title) return;
+    document.getElementById('end-title').textContent = END_CARD.title;
+    document.getElementById('end-text').textContent  = END_CARD.text || '';
+    var ul = document.getElementById('end-points');
+    ul.innerHTML = '';
+    (END_CARD.points || []).forEach(function (t) {
+      var li = document.createElement('li'); li.textContent = t; ul.appendChild(li);
+    });
+    document.getElementById('end-note').textContent = END_CARD.note || '';
+    showCta(false);
+    videoEl.style.visibility = 'hidden';   /* the last frame is white; don't let it bleed at the edges */
+    endOverlay.classList.add('is-visible');
+  }
+  var replayBtn = document.getElementById('end-replay');
+  if (replayBtn) replayBtn.addEventListener('click', function () {
+    endOverlay.classList.remove('is-visible');
+    videoEl.style.visibility = '';
+    videoEl.currentTime = 0;
+    videoEl.play().catch(function () {});
+  });
+
   function onAllQuestionsComplete() {
     overlay.classList.remove('is-visible');
+    if (videoEl.ended || (videoEl.duration && videoEl.currentTime >= videoEl.duration - 0.5)) showEndCard();
     if (summaryAudioSrc) {
       window.parent.postMessage({
         type: 'sandbox-play-interaction',
@@ -842,8 +1081,9 @@ var PAUSE_QUESTIONS = {{PAUSE_QUESTIONS_JSON}};
 
   /* ── Dev helpers ──────────────────────────────────────────────────────── */
   document.addEventListener('keydown', function (e) {
-    /* P — trigger next pause question */
-    if ((e.key === 'p' || e.key === 'P') && PAUSE_QUESTIONS.length) {
+    /* P — trigger next pause question. Review only: in the LMS it would let a
+       learner skip the video and unlock completion. */
+    if (reviewTools && (e.key === 'p' || e.key === 'P') && PAUSE_QUESTIONS.length) {
       triggerNextPauseQuestion();
     }
   });

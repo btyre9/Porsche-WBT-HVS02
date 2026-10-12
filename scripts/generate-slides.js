@@ -645,6 +645,9 @@ function buildPauseQuestionsJson(slide, slideId) {
       // Optional pause timecode (seconds into the clip). Without it the question
       // fires when the clip ends — the original behaviour.
       at:              Number(slide[`Pause-At-${i}`]),
+      // Optional rewind point (seconds). A wrong answer replays the video from
+      // here and asks the question again at its pause point.
+      rewind:          Number(slide[`Pause-Rewind-${i}`]),
       choices: [
         slide[`Pause-Choice-${i}-A`] || '',
         slide[`Pause-Choice-${i}-B`] || '',
@@ -1358,6 +1361,13 @@ function buildTokens(slide, allSlides, courseTitle, templateHtml, imageCatalog) 
       ? `../assets/audio/vo/${slideId}${slideId.includes('_') ? '_' : '-'}SUMMARY.mp3`
       : '',
     PAUSE_QUESTIONS_JSON: buildPauseQuestionsJson(slide, slideId),
+    // video-scenario end card (End-Title, End-Text, End-Point-1..6, End-Note)
+    END_CARD_JSON: (function () {
+      const points = [];
+      for (let i = 1; i <= 6; i++) { if (!slide[`End-Point-${i}`]) break; points.push(slide[`End-Point-${i}`]); }
+      return JSON.stringify({ title: slide['End-Title'] || '', text: slide['End-Text'] || '',
+                              points, note: slide['End-Note'] || '' }).replace(/</g, '\\u003c');
+    }()),
     ON_SCREEN_TEXT: escHtml(onScreen),
     HERO_SUBTITLE:  escHtml(heroSubtitle),
     MODULE_LABEL:   escHtml(courseTitle),

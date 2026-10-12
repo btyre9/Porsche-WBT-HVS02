@@ -166,6 +166,20 @@
       return String(raw || "").trim();
     },
 
+    // Completion for a module with no final quiz (e.g. a single video slide):
+    // no score, just completed (2004) / completed (1.2).
+    reportComplete: function () {
+      if (!this.api) return false;
+      if (this.version === "2004") {
+        this.setValue("cmi.completion_status", "completed");
+      } else {
+        var s12 = this.getValue("cmi.core.lesson_status");
+        if (s12 !== "passed" && s12 !== "failed") this.setValue("cmi.core.lesson_status", "completed");
+      }
+      this.commit();
+      return true;
+    },
+
     setIncomplete: function () {
       if (!this.api) return;
       // Only set incomplete if the course hasn't been completed yet
@@ -436,6 +450,13 @@
         updateAudioUi();
       })
       .catch(function () {
+        if (state.audio && state.audio.error) {   // file missing, not an autoplay block
+          state.pendingAudioStart = false;
+          disarmAudioUnlockListeners();
+          setAudioStartOverlayVisible(false);
+          updateAudioUi();
+          return;
+        }
         state.pendingAudioStart = true;
         armAudioUnlockListeners();
         var slides = state.data && state.data.slides || [];
@@ -627,6 +648,13 @@
     var code = "";
     try { if (this && this.error) code = " (media error code " + this.error.code + ")"; } catch (_e) {}
     voGateLog("FAIL-OPEN on '" + (e && e.type) + "'" + code + " - releasing Next.");
+    // A slide with no narration file (e.g. a no-VO module) must not leave the
+    // first slide's "Click the slide to begin" overlay up with nothing to start.
+    if (this === state.audio) {
+      state.pendingAudioStart = false;
+      disarmAudioUnlockListeners();
+      setAudioStartOverlayVisible(false);
+    }
     onAudioEnded();
   }
 
@@ -974,6 +1002,8 @@
   function toggleMute() {
     state.muted = !state.muted;
     if (state.audio) state.audio.muted = state.muted;
+    // Slides own their media (e.g. the video-scenario player): tell them too.
+    postMessageToSlide({ type: "mute-state", muted: state.muted });
 
     $("icon-vol-on").style.display = state.muted ? "none" : "";
     $("icon-vol-off").style.display = state.muted ? "" : "none";
@@ -1187,6 +1217,7 @@
     }
 
     var channel = new Audio(url);
+    channel.muted = state.muted;
     var done = false;
 
     function finish(allowResume) {
@@ -2376,12 +2407,17 @@
           // gating), which used to report 'not playing' and open the gate early.
           // What a gating slide needs to know is: is there narration still to come?
           var hasNarration = !!state.audio;
-          var narrationDone = !hasNarration || !!state.audio.ended;
+          // A narration file that failed to load is done too: its fail-open
+          // 'ended' may have gone out before this slide was listening.
+          var narrationDone = !hasNarration || !!state.audio.ended || !!state.audio.error;
           postPlayState(hasNarration && !narrationDone, narrationDone);
           break;
         }
         case "sandbox-request-cc":
           postMessageToSlide({ type: "cc-state", on: state.ccEnabled });
+          break;
+        case "sandbox-request-mute":
+          postMessageToSlide({ type: "mute-state", muted: state.muted });
           break;
         case "sandbox-lock-next":
           state.nextLockedByInteraction = true;
@@ -2390,6 +2426,11 @@
         case "sandbox-unlock-next":
           var wasInteractionLocked = state.nextLockedByInteraction;
           state.nextLockedByInteraction = false;
+          // No final quiz → finishing the last slide's interaction completes the module.
+          if (state.finalTotal === 0 && state.data && state.data.slides &&
+              state.slideIndex === state.data.slides.length - 1) {
+            scorm.reportComplete();
+          }
           updateNavButtons();
           if (wasInteractionLocked && !state.nextLockedByAudio && !state.nextLockedByInteractionAudio) pulseNextButton();
           break;

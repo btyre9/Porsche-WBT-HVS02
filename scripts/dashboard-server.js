@@ -74,6 +74,8 @@ const MIME_TYPES = {
   '.webp': 'image/webp',
   '.svg':  'image/svg+xml',
   '.vtt':  'text/vtt; charset=utf-8',
+  '.mp4':  'video/mp4',
+  '.webm': 'video/webm',
   '.mp3':  'audio/mpeg',
   '.pdf':  'application/pdf',
   '.md':   'text/plain; charset=utf-8',
@@ -1514,12 +1516,35 @@ const server = http.createServer((req, res) => {
     const ext = path.extname(filePath).toLowerCase();
     const contentType = MIME_TYPES[ext] || 'application/octet-stream';
 
-    res.writeHead(200, {
+    const headers = {
       'Content-Type': contentType,
+      'Accept-Ranges': 'bytes',
       'Cache-Control': 'no-store, no-cache, must-revalidate',
       'Pragma': 'no-cache',
       'Expires': '0'
-    });
+    };
+    // Byte ranges: browsers need these to seek in video/audio. Without them a
+    // seek on a long video restarts it from 0.
+    const range = /^bytes=(\d*)-(\d*)$/.exec(req.headers.range || '');
+    if (range && (range[1] || range[2])) {
+      const size  = stats.size;
+      let start   = range[1] ? parseInt(range[1], 10) : size - parseInt(range[2], 10);
+      let end     = range[1] && range[2] ? parseInt(range[2], 10) : size - 1;
+      if (start < 0) start = 0;
+      if (end >= size) end = size - 1;
+      if (start > end || start >= size) {
+        res.writeHead(416, { 'Content-Range': `bytes */${size}` });
+        res.end();
+        return;
+      }
+      headers['Content-Range']  = `bytes ${start}-${end}/${size}`;
+      headers['Content-Length'] = end - start + 1;
+      res.writeHead(206, headers);
+      fs.createReadStream(filePath, { start, end }).pipe(res);
+      return;
+    }
+    headers['Content-Length'] = stats.size;
+    res.writeHead(200, headers);
     fs.createReadStream(filePath).pipe(res);
   });
 });

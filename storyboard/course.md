@@ -1,153 +1,94 @@
-# Course: [Module Title Here]
+# Course: Personal Protective Equipment (PPE)
+# Player-Title: P29 HVT Certification - Module 2 - Personal Protective Equipment (PPE)
 
-Module ID: XX01  |  Version: 1.0  |  Status: Draft
-Series: [Training Series Name] — Module [N] of [Total]
-Prerequisite: [Previous module ID or "None"]
-
-How to use: Each slide starts with a "Slide XX" heading. Fields follow in Key: Value format.
-Lines starting with >> are stage direction annotations — ignored by the parser.
-Run `npm run import-storyboard -- --docx storyboard/[ModuleName]-Storyboard.docx` to parse into the course.
-
-File naming convention: underscores only — 01, not SLD-XX01-001.
+Module ID: HVS02  |  Version: 0.2  |  Status: Draft
+Series: P29 High-Voltage Technician Certification — Module 2 of 2
+Source: PPE_full_video.mp4 (12:41, PCNA). Compressed for SCORM to ppe_video_HVS02.mp4; captions ppe_video_HVS02.vtt from a machine transcript (reviewed).
+Format: an instructions slide, then the video with five knowledge checks. No voiceover. A wrong answer replays the section that covers the question, then asks it again. Not scored: the module reports complete to the LMS when the video ends and all five are answered correctly.
 
 ---
 
-## Slide 01 — Title Slide
+## Slide 1S01 — Personal Protective Equipment (PPE)
 
-Slide-ID: 01
-Template-ID: hero-title
-Slide-Title: [Module Title Here]
-On-Screen-Text: [Module Title] | [Series Name] | [Organization]
->> On slide load → 1S01-INTRO.mp3
-Voiceover-INTRO: [Welcome VO introducing the module, its purpose, and what the learner will gain.]
-Caption-Text: [First sentence of the VO — used as closed caption text.]
-Image: [Art direction: describe the ideal hero image — subject, mood, composition, setting. This will be used to source or generate the asset.]
+Slide-ID: 1S01
+Template-ID: content-bullets
+Slide-Title: Personal Protective Equipment (PPE)
+On-Screen-Text: This video shows the personal protective equipment required for high-voltage work on Porsche vehicles, and how to check, wear, and care for it.
+Bullet-1: Watch the video | It runs about 13 minutes and starts when you select Next. You can pause it at any time.
+Bullet-2: Answer five knowledge checks | The video pauses five times to ask about what you just watched.
+Bullet-3: Correct answer | The video continues.
+Bullet-4: Incorrect answer | The video replays the section that covers that topic, then asks the question again.
+Bullet-5: Finish | Answer all five correctly and watch to the end to complete the module.
+Image-File: 1S01.jpg
+Image: Frame from the PPE video at 10:32: technician in a full 400-volt PPE kit, arc-rated face shield down.
+Caption-Text: Watch the video and answer five knowledge checks along the way.
 Status: Draft
-Notes: Full-bleed hero image. Title fades in at 0.5s.
+Notes: content-bullets used as a title plus instructions slide. No voiceover (requested). Wording follows the HVS01 1S03 navigation slide.
 
 ---
 
-## Slide 02 — Learning Objectives
+## Slide 1S02 — Watch: High-Voltage PPE
 
-Slide-ID: 02
-Template-ID: learning-objectives
-Slide-Title: Learning Objectives
-On-Screen-Text: Module [N] Learning Objectives
->> On slide load → 1S02-INTRO.mp3
-Voiceover-INTRO: [VO listing each learning objective. Each objective should be mentioned explicitly so the slide animations can sync to the audio.]
-Caption-Text: [Summary caption for this slide.]
+Slide-ID: 1S02
+Template-ID: video-scenario
+Slide-Title: Personal Protective Equipment for High-Voltage Work
+Video-File: ppe_video_HVS02.mp4
+Caption-Text: The video pauses five times for a knowledge check.
+Pause-At-1: 186
+Pause-Rewind-1: 149.5
+Pause-Question-1: Using Ohm's law, how much current can 300 volts drive through a body with a hand-to-hand resistance of 1,000 ohms?
+Pause-Choice-1-A: 3 milliamps
+Pause-Choice-1-B: 30 milliamps
+Pause-Choice-1-C: 300 milliamps
+Pause-Choice-1-D: 3,000 milliamps
+Pause-Correct-1: C
+Pause-Feedback-Correct-1: Correct. 300 volts divided by 1,000 ohms is 300 milliamps, three times the 100 milliamps considered deadly.
+Pause-Feedback-Incorrect-1: Not quite. Let's rewatch the section on how electric current affects the body. Listen for the Ohm's law example.
+Pause-At-2: 387.5
+Pause-Rewind-2: 362
+Pause-Question-2: The test date stamped on your rubber insulating gloves is eight months old. What should you do?
+Pause-Choice-2-A: Use them if they pass the air-inflation test
+Pause-Choice-2-B: Use them with leather protector gloves over them
+Pause-Choice-2-C: Use them for low-voltage tasks only
+Pause-Choice-2-D: Take them out of service and send them for testing and recertification
+Pause-Correct-2: D
+Pause-Feedback-Correct-2: Correct. Rubber insulating gloves must be lab-tested and recertified every six months. The air-inflation test is a check before each use, not a replacement for recertification.
+Pause-Feedback-Incorrect-2: Not quite. Let's rewatch the section on glove testing. Listen for how often gloves must be recertified.
+Pause-At-3: 586
+Pause-Rewind-3: 535.5
+Pause-Question-3: Why does work on Porsche battery electric vehicles (BEVs) require a higher level of arc-flash protection than work on hybrids?
+Pause-Choice-3-A: BEVs operate at 800 volts, hybrids at 400 volts
+Pause-Choice-3-B: BEVs use AC current, hybrids use DC current
+Pause-Choice-3-C: BEV technicians don't wear rubber insulating gloves
+Pause-Choice-3-D: Hybrids don't need arc-flash protection
+Pause-Correct-3: A
+Pause-Feedback-Correct-3: Correct. The energy potential in the system sets the arc rating required. Check the Porsche Special Tools subspace on PPN for the exact PPE kit.
+Pause-Feedback-Incorrect-3: Not quite. Let's rewatch the section on arc-rated clothing. Listen for the voltages Porsche BEVs and hybrids operate at.
+Pause-At-4: 630
+Pause-Rewind-4: 593
+Pause-Question-4: Which designation should you look for on the label of shoes worn for high-voltage work?
+Pause-Choice-4-A: ESD (anti-static)
+Pause-Choice-4-B: EH (electrical hazard)
+Pause-Choice-4-C: SR (slip resistant)
+Pause-Choice-4-D: Any steel-toe rating
+Pause-Correct-4: B
+Pause-Feedback-Correct-4: Correct. EH-rated shoes insulate the wearer. Don't confuse them with anti-static shoes, which work differently. Hard-toe EH shoes are recommended.
+Pause-Feedback-Incorrect-4: Not quite. Let's rewatch the section on shoes. Listen for the designation on the label.
+Pause-At-5: 702
+Pause-Rewind-5: 676.5
+Pause-Question-5: Who is responsible for providing high-voltage PPE?
+Pause-Choice-5-A: The technician provides all of it
+Pause-Choice-5-B: The PPE supplier provides it with each vehicle
+Pause-Choice-5-C: The Porsche Center provides it, except shoes, which the technician provides
+Pause-Choice-5-D: The Porsche Center provides all of it, including shoes
+Pause-Correct-5: C
+Pause-Feedback-Correct-5: Correct. The Porsche Center provides PPE. Shoes are the technician's responsibility.
+Pause-Feedback-Incorrect-5: Not quite. Let's rewatch the section on purchasing PPE. Listen for who provides each item.
+End-Title: Module Complete
+End-Text: You've finished Personal Protective Equipment (PPE) and answered all five knowledge checks. Remember:
+End-Point-1: Rubber insulating gloves are your primary protection against electric shock. Check them before every use, and don't use them if the test date is more than six months old.
+End-Point-2: Arc-rated clothing, face shield, and balaclava, worn with the gloves, protect you from arc-flash burns.
+End-Point-3: Use the Porsche Special Tools subspace on PPN to find the right PPE kit for 400-volt and 800-volt work.
+End-Note: Your completion has been recorded. You can now close this module.
 Status: Draft
-Notes: Each objective fades in sequentially as mentioned in VO. All objectives must be visible before Next unlocks.
-
----
-
-## Slide 03 — Content Slide (with Stat)
-
-Slide-ID: 03
-Template-ID: content-stat
-Slide-Title: [Section Heading]
-On-Screen-Text: [Key statistic or pull quote that appears visually on the slide]
->> On slide load → 1S03-INTRO.mp3
-Voiceover-INTRO: [VO explaining the section content. Reference the on-screen stat/quote in the audio.]
-Caption-Text: [First sentence or key phrase from the VO.]
-Image: [Art direction for slide image.]
-Status: Draft
-Notes: Stat figure should be visually prominent. Content reveals in sections.
-
----
-
-## Slide 04 — Card Explore (Interactive)
-
-Slide-ID: 04
-Template-ID: card-explore
-Slide-Title: [Section Heading]
-On-Screen-Text: [Instruction text displayed on slide, e.g. "Click each card to explore."]
->> On slide load → 1S04-INTRO.mp3
-Voiceover-INTRO: [INTRO VO — sets up the topic and instructs learner to click cards.]
->> User clicks [Card 1 Label] → 1S04-CLICK-CardOne.mp3
-Voiceover-CLICK-CardOne: [VO that plays when learner clicks Card 1.]
->> User clicks [Card 2 Label] → 1S04-CLICK-CardTwo.mp3
-Voiceover-CLICK-CardTwo: [VO that plays when learner clicks Card 2.]
->> User clicks [Card 3 Label] → 1S04-CLICK-CardThree.mp3
-Voiceover-CLICK-CardThree: [VO that plays when learner clicks Card 3.]
-Caption-Text: [Caption for the slide — usually summarizes the INTRO VO.]
-Image: [Art direction for slide background image.]
-Status: Draft
-Notes: Cards locked until INTRO VO ends. All cards must be clicked to unlock Next.
-
----
-
-## Slide 05 — Knowledge Check
-
-Slide-ID: 01
-Template-ID: knowledge-check
-Slide-Title: Knowledge Check
->> On slide load → 2KC01-INTRO.mp3
-Voiceover-INTRO: Let's check your understanding. Select the best answer.
-Question: [The knowledge check question text.]
-Choice-1: [First answer option]
-Choice-2: [Second answer option]
-Choice-3: [Third answer option]
-Choice-4: [Fourth answer option]
-Correct-Answer: [Number of correct choice — e.g. 2]
-Review-Slide: 03
-Caption-Text: Let's check your understanding.
-Status: Draft
-Notes: Wrong answer → "Back to Review" button → returns to Review-Slide. Correct answer unlocks Next.
-
----
-
-## Slide 06 — Final Quiz Question 1
-
-Slide-ID: 01
-Template-ID: final-quiz
-Slide-Title: Final Assessment — Question 1
->> On slide load → 3FQ01-INTRO.mp3
-Voiceover-INTRO: Question one. Choose the best answer.
-Question: [Quiz question text.]
-Choice-1: [First answer option]
-Choice-2: [Second answer option]
-Choice-3: [Third answer option]
-Choice-4: [Fourth answer option]
-Correct-Answer: [Number of correct choice]
-Caption-Text: Question one. Choose the best answer.
-Status: Draft
-Notes: Part of final assessment. Pass threshold: 80%. Score reported to SCORM.
-
----
-
-## Slide 07 — Quiz Score
-
-Slide-ID: 3FQ-SCORE
-Template-ID: quiz-score
-Slide-Title: Module Results
-On-Screen-Text: Module [N] Complete
-Status: Draft
-Notes: Pass threshold: 80%. Pass state: congratulations + continue. Fail state: encouragement + offer to review. Score reported to SCORM.
-
----
-
-## Field Reference
-
-Slide-ID: Unique slide identifier — 01, 01, 01. Use underscores only.
-Template-ID: Slide layout — hero-title, learning-objectives, content-bullets, content-stat, content-quote, content-split, card-explore, split-explore, video-bg, closing, knowledge-check, final-quiz, quiz-score
-Slide-Title: Display title shown in course menu
->> Stage direction lines (starting with >>) are ignored by the parser — show clip triggers and filenames
-Voiceover-INTRO: VO that plays on slide entry (required on all slides with audio)
-Voiceover-CLICK-Label: VO triggered when a named card or hotspot is clicked
-Voiceover-TAB-Label: VO triggered when a named tab or accordion section opens
-Voiceover-STEP-N: VO triggered at step N in a sequence (N is zero-padded: 01, 02, etc.)
-On-Screen-Text: Main headline or key text displayed visually on the slide
-Caption-Text: Closed-caption text (VTT overlay) — usually matches or summarizes Voiceover-INTRO
-Image: Art direction for the slide image. Describe subject, mood, composition, setting.
-Image-File: (Production) Actual filename once the image has been sourced — e.g. technician-with-customer.jpg
-Image-Position: (Optional) Per-slide crop framing — CSS position, e.g. 70% 25% (x% y%) or "center top". Default center.
-Image-Scale: (Optional) Per-slide zoom factor — 1 = none, 1.2 = 20% closer. Default 1. Settable visually via dashboard 🎯 Adjust Image.
-Video: Art direction for the background video. Describe subject, camera movement, tone.
-Video-File: (Production) Actual filename once the video has been sourced — e.g. service-bay-walkthrough.webm
-Question: (KC / FQ only) The question text
-Choice-1 … Choice-4: (KC / FQ only) Answer choices
-Correct-Answer: (KC / FQ only) Number of the correct choice — e.g. 2
-Review-Slide: (KC only) Slide ID to return to on wrong answer — e.g. 03
-Status: Authoring status — Draft, In Review, or Approved
-Notes: Developer / production notes — not parsed into course data
+Notes: video-scenario chosen — the PCNA PPE video is the module. Starts on entry (Next is the gesture). Pause times sit just after the point they test (transcript end times 3:04.7, 6:27.2, 9:46.7, 10:30.4, 11:42.0). Rewind points are the start of each covering section (2:29.8, 6:02.5, 8:56.2, 9:53.6, 11:17.0). Review tools (scrub bar, jump buttons 1–5 and End) appear only on a local preview or review build.

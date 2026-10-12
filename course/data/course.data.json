@@ -9,29 +9,12 @@
   },
   "slides": [
     {
-      "id": "SLD_TEST_001",
-      "title": "Module title",
-      "audio_vo": "assets/audio/vo/SLD_TEST_001_INTRO.mp3"
+      "id": "1S01",
+      "title": "Personal Protective Equipment (PPE)"
     },
     {
-      "id": "SLD_TEST_002",
-      "title": "Hotspot stage",
-      "audio_vo": "assets/audio/vo/SLD_TEST_002_INTRO.mp3"
-    },
-    {
-      "id": "SLD_TEST_003",
-      "title": "Accordion rail",
-      "audio_vo": "assets/audio/vo/SLD_TEST_003_INTRO.mp3"
-    },
-    {
-      "id": "SLD_TEST_004",
-      "title": "Content split",
-      "audio_vo": "assets/audio/vo/SLD_TEST_004_INTRO.mp3"
-    },
-    {
-      "id": "SLD_TEST_005",
-      "title": "What you'll learn",
-      "audio_vo": "assets/audio/vo/SLD_TEST_005_INTRO.mp3"
+      "id": "1S02",
+      "title": "Personal Protective Equipment for High-Voltage Work"
     }
   ],
   "quiz": {

@@ -21,7 +21,8 @@
     "new-module": "node scripts/new-module.js",
     "lint-storyboard": "node scripts/lint-storyboard.js",
     "hub": "node scripts/hub-server.js",
-    "audit": "node scripts/audit-module.js"
+    "audit": "node scripts/audit-module.js",
+    "share": "node scripts/build-share.js"
   },
   "devDependencies": {
     "browser-sync": "^3.0.4",
